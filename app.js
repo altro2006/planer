@@ -130,13 +130,13 @@ function updateSlider(type) {
 function getSliderVal(type) {
   if (type === 'trainDays') {
     const sl = document.getElementById('trainDaysSlider');
-    return sl.dataset.active ? sl.value : null;
+    return sl ? sl.value : null;
   } else if (type === 'time') {
     const sl = document.getElementById('timeSlider');
-    return sl.dataset.active ? sl.value : null;
+    return sl ? sl.value : null;
   } else if (type === 'level') {
     const sl = document.getElementById('levelSlider');
-    return sl.dataset.active ? LEVEL_VALS[parseInt(sl.value)] : null;
+    return sl ? LEVEL_VALS[parseInt(sl.value)] : null;
   }
   return null;
 }
@@ -632,4 +632,17 @@ function showToast(msg) {
 // ── Init ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initToggleGroups();
+  initSliders();
 });
+
+function initSliders() {
+  // Set sliders to their minimum values and display them
+  const trainSl = document.getElementById('trainDaysSlider');
+  if (trainSl) { trainSl.value = 2; updateSlider('trainDays'); }
+
+  const timeSl = document.getElementById('timeSlider');
+  if (timeSl) { timeSl.value = 30; updateSlider('time'); }
+
+  const levelSl = document.getElementById('levelSlider');
+  if (levelSl) { levelSl.value = 0; updateSlider('level'); }
+}

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FORGE AI — Twój Personalny Trener</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Background noise texture -->
+  <div class="bg-noise"></div>
+  <div class="bg-gradient"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">FORGE<span class="logo-accent">AI</span></span>
+        <span class="logo-badge">BETA</span>
+      </div>
+      <nav class="mode-switcher">
+        <button class="mode-btn active" data-mode="plan" onclick="switchMode('plan')">
+          <span class="mode-icon">🏋️</span>
+          <span>Plan Treningowy</span>
+        </button>
+        <button class="mode-btn" data-mode="diet" onclick="switchMode('diet')">
+          <span class="mode-icon">🥗</span>
+          <span>Plan Diety</span>
+        </button>
+        <div class="mode-slider"></div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="main-layout">
+    <!-- LEFT: Form Panel -->
+    <aside class="form-panel">
+      <div class="panel-header">
+        <div class="panel-title" id="formTitle">Skonfiguruj Plan Treningowy</div>
+        <div class="panel-subtitle" id="formSubtitle">Wypełnij poniższe parametry, a AI ułoży dla Ciebie optymalny plan</div>
+      </div>
+
+      <!-- TRAINING FORM -->
+      <form id="planForm" class="forge-form active">
+        <div class="form-section">
+          <label class="form-label">Liczba treningów w tygodniu</label>
+          <div class="toggle-group" id="trainDaysGroup">
+            <button type="button" class="toggle-btn" data-val="2">2</button>
+            <button type="button" class="toggle-btn active" data-val="3">3</button>
+            <button type="button" class="toggle-btn" data-val="4">4</button>
+            <button type="button" class="toggle-btn" data-val="5">5</button>
+            <button type="button" class="toggle-btn" data-val="6">6</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Cel treningowy</label>
+          <div class="card-select" id="goalGroup">
+            <div class="card-option active" data-val="masa mięśniowa">
+              <span class="card-icon">💪</span>
+              <span class="card-name">Masa mięśniowa</span>
+              <span class="card-desc">Budowa muskulatury i siły</span>
+            </div>
+            <div class="card-option" data-val="redukcja tkanki tłuszczowej">
+              <span class="card-icon">🔥</span>
+              <span class="card-name">Redukcja</span>
+              <span class="card-desc">Spalanie tłuszczu, rzeźba</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Czas na trening</label>
+          <div class="toggle-group" id="timeGroup">
+            <button type="button" class="toggle-btn" data-val="30 minut">30 min</button>
+            <button type="button" class="toggle-btn" data-val="45 minut">45 min</button>
+            <button type="button" class="toggle-btn active" data-val="60 minut">60 min</button>
+            <button type="button" class="toggle-btn" data-val="90 minut">90 min</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Partie mięśniowe do trenowania</label>
+          <div class="tag-select" id="muscleGroup">
+            <span class="tag-btn active" data-val="klatka piersiowa">Klatka</span>
+            <span class="tag-btn active" data-val="plecy">Plecy</span>
+            <span class="tag-btn active" data-val="nogi">Nogi</span>
+            <span class="tag-btn active" data-val="barki">Barki</span>
+            <span class="tag-btn active" data-val="biceps">Biceps</span>
+            <span class="tag-btn active" data-val="triceps">Triceps</span>
+            <span class="tag-btn" data-val="brzuch">Brzuch</span>
+            <span class="tag-btn" data-val="łydki">Łydki</span>
+            <span class="tag-btn" data-val="pośladki">Pośladki</span>
+            <span class="tag-btn" data-val="przedramiona">Przedramiona</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Kontuzje / ograniczenia</label>
+          <div class="tag-select" id="injuryGroup">
+            <span class="tag-btn" data-val="brak kontuzji">Brak</span>
+            <span class="tag-btn" data-val="problemy z kolanami">Kolana</span>
+            <span class="tag-btn" data-val="problemy z kręgosłupem">Kręgosłup</span>
+            <span class="tag-btn" data-val="problemy z barkiem">Bark</span>
+            <span class="tag-btn" data-val="problemy z nadgarstkami">Nadgarstki</span>
+            <span class="tag-btn" data-val="problemy z łokciem">Łokieć</span>
+            <span class="tag-btn" data-val="problemy z biodrami">Biodra</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Poziom zaawansowania</label>
+          <div class="level-select" id="levelGroup">
+            <div class="level-option active" data-val="początkujący (do 1 roku treningu)">
+              <div class="level-bar"><span></span><span class="e"></span><span class="e"></span></div>
+              <span>Początkujący</span>
+            </div>
+            <div class="level-option" data-val="średnio zaawansowany (1-3 lata treningu)">
+              <div class="level-bar"><span class="f"></span><span class="f"></span><span class="e"></span></div>
+              <span>Średni</span>
+            </div>
+            <div class="level-option" data-val="zaawansowany (ponad 3 lata treningu)">
+              <div class="level-bar"><span class="f"></span><span class="f"></span><span class="f"></span></div>
+              <span>Zaawansowany</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Preferowany split</label>
+          <div class="split-select" id="splitGroup">
+            <div class="split-option active" data-val="Full Body">
+              <span class="split-icon">🔄</span>
+              <span class="split-name">Full Body</span>
+            </div>
+            <div class="split-option" data-val="Push/Pull/Legs (PPL)">
+              <span class="split-icon">↕️</span>
+              <span class="split-name">PPL</span>
+            </div>
+            <div class="split-option" data-val="Upper/Lower">
+              <span class="split-icon">↕️</span>
+              <span class="split-name">Upper/Lower</span>
+            </div>
+            <div class="split-option" data-val="Bro Split (jedna partia dziennie)">
+              <span class="split-icon">💪</span>
+              <span class="split-name">Bro Split</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Dostępny sprzęt</label>
+          <div class="tag-select" id="equipGroup">
+            <span class="tag-btn active" data-val="wolne ciężary (sztangi, hantle)">Wolne ciężary</span>
+            <span class="tag-btn active" data-val="maszyny na siłowni">Maszyny</span>
+            <span class="tag-btn" data-val="wyciągi linowe">Wyciągi</span>
+            <span class="tag-btn" data-val="drążek">Drążek</span>
+            <span class="tag-btn" data-val="poręcze">Poręcze</span>
+            <span class="tag-btn" data-val="kettlebell">Kettlebell</span>
+            <span class="tag-btn" data-val="gumy oporowe">Gumy oporowe</span>
+            <span class="tag-btn" data-val="tylko ćwiczenia z masą ciała">Masa ciała</span>
+          </div>
+        </div>
+
+        <button type="button" class="generate-btn" onclick="generatePlan()">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">Wygeneruj Plan</span>
+          <span class="btn-glow"></span>
+        </button>
+      </form>
+
+      <!-- DIET FORM -->
+      <form id="dietForm" class="forge-form">
+        <div class="form-section">
+          <label class="form-label">Płeć</label>
+          <div class="card-select" id="genderGroup">
+            <div class="card-option active" data-val="mężczyzna">
+              <span class="card-icon">♂️</span>
+              <span class="card-name">Mężczyzna</span>
+            </div>
+            <div class="card-option" data-val="kobieta">
+              <span class="card-icon">♀️</span>
+              <span class="card-name">Kobieta</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-section half">
+            <label class="form-label">Wiek</label>
+            <div class="number-input-wrap">
+              <input type="number" id="ageInput" class="forge-input" min="10" max="100" value="25" placeholder="lat" />
+              <span class="input-unit">lat</span>
+            </div>
+          </div>
+          <div class="form-section half">
+            <label class="form-label">Waga</label>
+            <div class="number-input-wrap">
+              <input type="number" id="weightInput" class="forge-input" min="30" max="300" value="75" placeholder="kg" />
+              <span class="input-unit">kg</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Wzrost</label>
+          <div class="number-input-wrap">
+            <input type="number" id="heightInput" class="forge-input" min="100" max="250" value="175" placeholder="cm" />
+            <span class="input-unit">cm</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Aktywność w ciągu dnia</label>
+          <div class="activity-select" id="activityGroup">
+            <div class="activity-option active" data-val="siedzący tryb życia (praca biurowa, brak aktywności)">
+              <span class="activity-icon">💻</span>
+              <span class="activity-name">Siedzący</span>
+              <span class="activity-desc">Praca biurowa</span>
+            </div>
+            <div class="activity-option" data-val="lekko aktywny (spacery, praca stojąca)">
+              <span class="activity-icon">🚶</span>
+              <span class="activity-name">Lekko aktywny</span>
+              <span class="activity-desc">Spacery, praca stojąca</span>
+            </div>
+            <div class="activity-option" data-val="umiarkowanie aktywny (regularne ćwiczenia 3-4x w tygodniu)">
+              <span class="activity-icon">🏃</span>
+              <span class="activity-name">Umiarkowany</span>
+              <span class="activity-desc">3-4x treningi/tyg</span>
+            </div>
+            <div class="activity-option" data-val="bardzo aktywny (ciężka praca fizyczna lub intensywne treningi 6x w tygodniu)">
+              <span class="activity-icon">⚡</span>
+              <span class="activity-name">Bardzo aktywny</span>
+              <span class="activity-desc">Ciężka praca fizyczna</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Cel diety</label>
+          <div class="card-select three" id="dietGoalGroup">
+            <div class="card-option active" data-val="budowa masy mięśniowej (nadwyżka kaloryczna)">
+              <span class="card-icon">📈</span>
+              <span class="card-name">Masa</span>
+              <span class="card-desc">Nadwyżka kaloryczna</span>
+            </div>
+            <div class="card-option" data-val="redukcja tkanki tłuszczowej (deficyt kaloryczny)">
+              <span class="card-icon">📉</span>
+              <span class="card-name">Redukcja</span>
+              <span class="card-desc">Deficyt kaloryczny</span>
+            </div>
+            <div class="card-option" data-val="utrzymanie wagi i rekomponycja sylwetki">
+              <span class="card-icon">⚖️</span>
+              <span class="card-name">Utrzymanie</span>
+              <span class="card-desc">Rekomponycja</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="generate-btn" onclick="generateDiet()">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">Oblicz Plan Diety</span>
+          <span class="btn-glow"></span>
+        </button>
+      </form>
+    </aside>
+
+    <!-- RIGHT: Results Panel -->
+    <section class="results-panel">
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">🏋️</div>
+        <div class="empty-title">Gotowy do akcji</div>
+        <div class="empty-text">Wypełnij formularz po lewej stronie i wygeneruj swój spersonalizowany plan za pomocą AI</div>
+        <div class="empty-features">
+          <div class="empty-feature"><span>✓</span> Plany dostosowane do Twoich możliwości</div>
+          <div class="empty-feature"><span>✓</span> Uwzględnia kontuzje i ograniczenia</div>
+          <div class="empty-feature"><span>✓</span> Szczegółowe instrukcje ćwiczeń</div>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loadingState" class="loading-state hidden">
+        <div class="loading-animation">
+          <div class="loading-bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+          <div class="loading-title">AI pracuje dla Ciebie</div>
+          <div class="loading-sub" id="loadingMessage">Analizuję Twoje parametry...</div>
+        </div>
+      </div>
+
+      <!-- Plan Results -->
+      <div id="planResults" class="plan-results hidden">
+        <div class="results-header">
+          <div>
+            <div class="results-title">Twój Plan Treningowy</div>
+            <div class="results-meta" id="planMeta"></div>
+          </div>
+          <button class="reset-btn" onclick="resetResults()">↺ Reset</button>
+        </div>
+        <div class="days-nav" id="daysNav"></div>
+        <div id="dayContent" class="day-content"></div>
+      </div>
+
+      <!-- Diet Results -->
+      <div id="dietResults" class="diet-results hidden">
+        <div class="results-header">
+          <div>
+            <div class="results-title">Twój Plan Diety</div>
+            <div class="results-meta" id="dietMeta"></div>
+          </div>
+          <button class="reset-btn" onclick="resetResults()">↺ Reset</button>
+        </div>
+        <div id="dietContent"></div>
+      </div>
+    </section>
+  </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

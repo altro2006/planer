@@ -970,3 +970,103 @@ html, body {
   .results-panel { padding: 20px 16px; }
   .form-panel { padding: 20px 16px; }
 }
+
+/* ===== SLIDERS ===== */
+.slider-wrap {
+  width: 100%;
+}
+
+.slider-value-display {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 32px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 12px;
+  min-height: 40px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.slider-value-display.level-display {
+  font-size: 24px;
+}
+
+.slider-unit {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0;
+}
+
+.forge-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-hover);
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  border: none;
+  /* filled track via JS inline style on --val */
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--pct, 0%),
+    var(--bg-hover) var(--pct, 0%),
+    var(--bg-hover) 100%
+  );
+}
+
+.forge-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--bg-base);
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(255,77,0,0.4);
+  transition: box-shadow 0.15s;
+}
+
+.forge-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 4px 20px rgba(255,77,0,0.6);
+}
+
+.forge-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--bg-base);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.forge-slider:not([data-active]) {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.forge-slider[data-active] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 0 2px;
+}
+
+.slider-ticks span {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}

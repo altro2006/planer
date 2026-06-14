@@ -10,11 +10,9 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Background noise texture -->
   <div class="bg-noise"></div>
   <div class="bg-gradient"></div>
 
-  <!-- Header -->
   <header class="header">
     <div class="header-inner">
       <div class="logo">
@@ -31,14 +29,11 @@
           <span class="mode-icon">🥗</span>
           <span>Plan Diety</span>
         </button>
-        <div class="mode-slider"></div>
       </nav>
     </div>
   </header>
 
-  <!-- Main Layout -->
   <main class="main-layout">
-    <!-- LEFT: Form Panel -->
     <aside class="form-panel">
       <div class="panel-header">
         <div class="panel-title" id="formTitle">Skonfiguruj Plan Treningowy</div>
@@ -47,11 +42,12 @@
 
       <!-- TRAINING FORM -->
       <form id="planForm" class="forge-form active">
+
         <div class="form-section">
           <label class="form-label">Liczba treningów w tygodniu</label>
           <div class="toggle-group" id="trainDaysGroup">
             <button type="button" class="toggle-btn" data-val="2">2</button>
-            <button type="button" class="toggle-btn active" data-val="3">3</button>
+            <button type="button" class="toggle-btn" data-val="3">3</button>
             <button type="button" class="toggle-btn" data-val="4">4</button>
             <button type="button" class="toggle-btn" data-val="5">5</button>
             <button type="button" class="toggle-btn" data-val="6">6</button>
@@ -61,7 +57,7 @@
         <div class="form-section">
           <label class="form-label">Cel treningowy</label>
           <div class="card-select" id="goalGroup">
-            <div class="card-option active" data-val="masa mięśniowa">
+            <div class="card-option" data-val="masa mięśniowa">
               <span class="card-icon">💪</span>
               <span class="card-name">Masa mięśniowa</span>
               <span class="card-desc">Budowa muskulatury i siły</span>
@@ -77,22 +73,22 @@
         <div class="form-section">
           <label class="form-label">Czas na trening</label>
           <div class="toggle-group" id="timeGroup">
-            <button type="button" class="toggle-btn" data-val="30 minut">30 min</button>
-            <button type="button" class="toggle-btn" data-val="45 minut">45 min</button>
-            <button type="button" class="toggle-btn active" data-val="60 minut">60 min</button>
-            <button type="button" class="toggle-btn" data-val="90 minut">90 min</button>
+            <button type="button" class="toggle-btn" data-val="30">30 min</button>
+            <button type="button" class="toggle-btn" data-val="45">45 min</button>
+            <button type="button" class="toggle-btn" data-val="60">60 min</button>
+            <button type="button" class="toggle-btn" data-val="90">90 min</button>
           </div>
         </div>
 
         <div class="form-section">
           <label class="form-label">Partie mięśniowe do trenowania</label>
           <div class="tag-select" id="muscleGroup">
-            <span class="tag-btn active" data-val="klatka piersiowa">Klatka</span>
-            <span class="tag-btn active" data-val="plecy">Plecy</span>
-            <span class="tag-btn active" data-val="nogi">Nogi</span>
-            <span class="tag-btn active" data-val="barki">Barki</span>
-            <span class="tag-btn active" data-val="biceps">Biceps</span>
-            <span class="tag-btn active" data-val="triceps">Triceps</span>
+            <span class="tag-btn" data-val="klatka piersiowa">Klatka</span>
+            <span class="tag-btn" data-val="plecy">Plecy</span>
+            <span class="tag-btn" data-val="nogi">Nogi</span>
+            <span class="tag-btn" data-val="barki">Barki</span>
+            <span class="tag-btn" data-val="biceps">Biceps</span>
+            <span class="tag-btn" data-val="triceps">Triceps</span>
             <span class="tag-btn" data-val="brzuch">Brzuch</span>
             <span class="tag-btn" data-val="łydki">Łydki</span>
             <span class="tag-btn" data-val="pośladki">Pośladki</span>
@@ -101,9 +97,8 @@
         </div>
 
         <div class="form-section">
-          <label class="form-label">Kontuzje / ograniczenia</label>
+          <label class="form-label">Kontuzje / ograniczenia <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(opcjonalnie)</span></label>
           <div class="tag-select" id="injuryGroup">
-            <span class="tag-btn" data-val="brak kontuzji">Brak</span>
             <span class="tag-btn" data-val="problemy z kolanami">Kolana</span>
             <span class="tag-btn" data-val="problemy z kręgosłupem">Kręgosłup</span>
             <span class="tag-btn" data-val="problemy z barkiem">Bark</span>
@@ -116,15 +111,15 @@
         <div class="form-section">
           <label class="form-label">Poziom zaawansowania</label>
           <div class="level-select" id="levelGroup">
-            <div class="level-option active" data-val="początkujący (do 1 roku treningu)">
-              <div class="level-bar"><span></span><span class="e"></span><span class="e"></span></div>
+            <div class="level-option" data-val="początkujący">
+              <div class="level-bar"><span class="f"></span><span class="e"></span><span class="e"></span></div>
               <span>Początkujący</span>
             </div>
-            <div class="level-option" data-val="średnio zaawansowany (1-3 lata treningu)">
+            <div class="level-option" data-val="średnio zaawansowany">
               <div class="level-bar"><span class="f"></span><span class="f"></span><span class="e"></span></div>
               <span>Średni</span>
             </div>
-            <div class="level-option" data-val="zaawansowany (ponad 3 lata treningu)">
+            <div class="level-option" data-val="zaawansowany">
               <div class="level-bar"><span class="f"></span><span class="f"></span><span class="f"></span></div>
               <span>Zaawansowany</span>
             </div>
@@ -134,11 +129,11 @@
         <div class="form-section">
           <label class="form-label">Preferowany split</label>
           <div class="split-select" id="splitGroup">
-            <div class="split-option active" data-val="Full Body">
+            <div class="split-option" data-val="Full Body">
               <span class="split-icon">🔄</span>
               <span class="split-name">Full Body</span>
             </div>
-            <div class="split-option" data-val="Push/Pull/Legs (PPL)">
+            <div class="split-option" data-val="Push/Pull/Legs">
               <span class="split-icon">↕️</span>
               <span class="split-name">PPL</span>
             </div>
@@ -146,7 +141,7 @@
               <span class="split-icon">↕️</span>
               <span class="split-name">Upper/Lower</span>
             </div>
-            <div class="split-option" data-val="Bro Split (jedna partia dziennie)">
+            <div class="split-option" data-val="Bro Split">
               <span class="split-icon">💪</span>
               <span class="split-name">Bro Split</span>
             </div>
@@ -156,14 +151,15 @@
         <div class="form-section">
           <label class="form-label">Dostępny sprzęt</label>
           <div class="tag-select" id="equipGroup">
-            <span class="tag-btn active" data-val="wolne ciężary (sztangi, hantle)">Wolne ciężary</span>
-            <span class="tag-btn active" data-val="maszyny na siłowni">Maszyny</span>
-            <span class="tag-btn" data-val="wyciągi linowe">Wyciągi</span>
+            <span class="tag-btn" data-val="sztanga">Sztanga</span>
+            <span class="tag-btn" data-val="hantle">Hantle</span>
+            <span class="tag-btn" data-val="maszyny">Maszyny</span>
+            <span class="tag-btn" data-val="wyciągi">Wyciągi</span>
             <span class="tag-btn" data-val="drążek">Drążek</span>
             <span class="tag-btn" data-val="poręcze">Poręcze</span>
             <span class="tag-btn" data-val="kettlebell">Kettlebell</span>
             <span class="tag-btn" data-val="gumy oporowe">Gumy oporowe</span>
-            <span class="tag-btn" data-val="tylko ćwiczenia z masą ciała">Masa ciała</span>
+            <span class="tag-btn" data-val="masa ciała">Masa ciała</span>
           </div>
         </div>
 
@@ -179,7 +175,7 @@
         <div class="form-section">
           <label class="form-label">Płeć</label>
           <div class="card-select" id="genderGroup">
-            <div class="card-option active" data-val="mężczyzna">
+            <div class="card-option" data-val="mężczyzna">
               <span class="card-icon">♂️</span>
               <span class="card-name">Mężczyzna</span>
             </div>
@@ -194,14 +190,14 @@
           <div class="form-section half">
             <label class="form-label">Wiek</label>
             <div class="number-input-wrap">
-              <input type="number" id="ageInput" class="forge-input" min="10" max="100" value="25" placeholder="lat" />
+              <input type="number" id="ageInput" class="forge-input" min="10" max="100" placeholder="np. 25" />
               <span class="input-unit">lat</span>
             </div>
           </div>
           <div class="form-section half">
             <label class="form-label">Waga</label>
             <div class="number-input-wrap">
-              <input type="number" id="weightInput" class="forge-input" min="30" max="300" value="75" placeholder="kg" />
+              <input type="number" id="weightInput" class="forge-input" min="30" max="300" placeholder="np. 75" />
               <span class="input-unit">kg</span>
             </div>
           </div>
@@ -210,7 +206,7 @@
         <div class="form-section">
           <label class="form-label">Wzrost</label>
           <div class="number-input-wrap">
-            <input type="number" id="heightInput" class="forge-input" min="100" max="250" value="175" placeholder="cm" />
+            <input type="number" id="heightInput" class="forge-input" min="100" max="250" placeholder="np. 175" />
             <span class="input-unit">cm</span>
           </div>
         </div>
@@ -218,22 +214,22 @@
         <div class="form-section">
           <label class="form-label">Aktywność w ciągu dnia</label>
           <div class="activity-select" id="activityGroup">
-            <div class="activity-option active" data-val="siedzący tryb życia (praca biurowa, brak aktywności)">
+            <div class="activity-option" data-val="siedzący">
               <span class="activity-icon">💻</span>
               <span class="activity-name">Siedzący</span>
               <span class="activity-desc">Praca biurowa</span>
             </div>
-            <div class="activity-option" data-val="lekko aktywny (spacery, praca stojąca)">
+            <div class="activity-option" data-val="lekko aktywny">
               <span class="activity-icon">🚶</span>
               <span class="activity-name">Lekko aktywny</span>
               <span class="activity-desc">Spacery, praca stojąca</span>
             </div>
-            <div class="activity-option" data-val="umiarkowanie aktywny (regularne ćwiczenia 3-4x w tygodniu)">
+            <div class="activity-option" data-val="umiarkowanie aktywny">
               <span class="activity-icon">🏃</span>
               <span class="activity-name">Umiarkowany</span>
               <span class="activity-desc">3-4x treningi/tyg</span>
             </div>
-            <div class="activity-option" data-val="bardzo aktywny (ciężka praca fizyczna lub intensywne treningi 6x w tygodniu)">
+            <div class="activity-option" data-val="bardzo aktywny">
               <span class="activity-icon">⚡</span>
               <span class="activity-name">Bardzo aktywny</span>
               <span class="activity-desc">Ciężka praca fizyczna</span>
@@ -244,17 +240,17 @@
         <div class="form-section">
           <label class="form-label">Cel diety</label>
           <div class="card-select three" id="dietGoalGroup">
-            <div class="card-option active" data-val="budowa masy mięśniowej (nadwyżka kaloryczna)">
+            <div class="card-option" data-val="masa">
               <span class="card-icon">📈</span>
               <span class="card-name">Masa</span>
               <span class="card-desc">Nadwyżka kaloryczna</span>
             </div>
-            <div class="card-option" data-val="redukcja tkanki tłuszczowej (deficyt kaloryczny)">
+            <div class="card-option" data-val="redukcja">
               <span class="card-icon">📉</span>
               <span class="card-name">Redukcja</span>
               <span class="card-desc">Deficyt kaloryczny</span>
             </div>
-            <div class="card-option" data-val="utrzymanie wagi i rekomponycja sylwetki">
+            <div class="card-option" data-val="utrzymanie">
               <span class="card-icon">⚖️</span>
               <span class="card-name">Utrzymanie</span>
               <span class="card-desc">Rekomponycja</span>
@@ -283,22 +279,17 @@
         </div>
       </div>
 
-      <!-- Loading state -->
       <div id="loadingState" class="loading-state hidden">
         <div class="loading-animation">
           <div class="loading-bars">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div>
           </div>
           <div class="loading-title">AI pracuje dla Ciebie</div>
           <div class="loading-sub" id="loadingMessage">Analizuję Twoje parametry...</div>
         </div>
       </div>
 
-      <!-- Plan Results -->
       <div id="planResults" class="plan-results hidden">
         <div class="results-header">
           <div>
@@ -311,7 +302,6 @@
         <div id="dayContent" class="day-content"></div>
       </div>
 
-      <!-- Diet Results -->
       <div id="dietResults" class="diet-results hidden">
         <div class="results-header">
           <div>
@@ -324,7 +314,6 @@
       </div>
     </section>
   </main>
-  </div>
 
   <script src="app.js"></script>
 </body>

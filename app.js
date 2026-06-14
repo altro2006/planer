@@ -97,22 +97,65 @@ function initToggleGroups() {
   });
 }
 
+
+// ── Slider Logic ────────────────────────────────────────
+const LEVEL_VALS = ['początkujący', 'średnio zaawansowany', 'zaawansowany'];
+const LEVEL_LABELS = ['Początkujący', 'Średnio zaawansowany', 'Zaawansowany'];
+
+function updateSlider(type) {
+  if (type === 'trainDays') {
+    const sl = document.getElementById('trainDaysSlider');
+    const val = parseInt(sl.value);
+    document.getElementById('trainDaysVal').textContent = val;
+    const pct = ((val - 2) / (6 - 2)) * 100;
+    sl.style.setProperty('--pct', pct + '%');
+    sl.dataset.active = '1';
+  } else if (type === 'time') {
+    const sl = document.getElementById('timeSlider');
+    const val = parseInt(sl.value);
+    document.getElementById('timeVal').textContent = val;
+    const pct = ((val - 30) / (120 - 30)) * 100;
+    sl.style.setProperty('--pct', pct + '%');
+    sl.dataset.active = '1';
+  } else if (type === 'level') {
+    const sl = document.getElementById('levelSlider');
+    const idx = parseInt(sl.value);
+    document.getElementById('levelVal').textContent = LEVEL_LABELS[idx];
+    const pct = (idx / 2) * 100;
+    sl.style.setProperty('--pct', pct + '%');
+    sl.dataset.active = '1';
+  }
+}
+
+function getSliderVal(type) {
+  if (type === 'trainDays') {
+    const sl = document.getElementById('trainDaysSlider');
+    return sl.dataset.active ? sl.value : null;
+  } else if (type === 'time') {
+    const sl = document.getElementById('timeSlider');
+    return sl.dataset.active ? sl.value : null;
+  } else if (type === 'level') {
+    const sl = document.getElementById('levelSlider');
+    return sl.dataset.active ? LEVEL_VALS[parseInt(sl.value)] : null;
+  }
+  return null;
+}
+
 // ── Read Values ─────────────────────────────────────────
 function getToggleVal(groupId)   { const el = document.querySelector(`#${groupId} .toggle-btn.active`);  return el ? el.dataset.val : null; }
 function getCardVal(groupId)     { const el = document.querySelector(`#${groupId} .card-option.active`); return el ? el.dataset.val : null; }
 function getTagVals(groupId)     { return Array.from(document.querySelectorAll(`#${groupId} .tag-btn.active`)).map(e => e.dataset.val); }
-function getLevelVal()           { const el = document.querySelector('.level-option.active');  return el ? el.dataset.val : null; }
 function getSplitVal()           { const el = document.querySelector('.split-option.active');  return el ? el.dataset.val : null; }
 function getActivityVal()        { const el = document.querySelector('.activity-option.active'); return el ? el.dataset.val : null; }
 
 function getPlanFormValues() {
   return {
-    trainDays : getToggleVal('trainDaysGroup'),
+    trainDays : getSliderVal('trainDays'),
     goal      : getCardVal('goalGroup'),
-    time      : getToggleVal('timeGroup'),
+    time      : getSliderVal('time'),
     muscles   : getTagVals('muscleGroup'),
     injuries  : getTagVals('injuryGroup'),
-    level     : getLevelVal(),
+    level     : getSliderVal('level'),
     split     : getSplitVal(),
     equipment : getTagVals('equipGroup'),
   };

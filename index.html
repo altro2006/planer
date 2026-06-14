@@ -45,12 +45,10 @@
 
         <div class="form-section">
           <label class="form-label">Liczba treningów w tygodniu</label>
-          <div class="toggle-group" id="trainDaysGroup">
-            <button type="button" class="toggle-btn" data-val="2">2</button>
-            <button type="button" class="toggle-btn" data-val="3">3</button>
-            <button type="button" class="toggle-btn" data-val="4">4</button>
-            <button type="button" class="toggle-btn" data-val="5">5</button>
-            <button type="button" class="toggle-btn" data-val="6">6</button>
+          <div class="slider-wrap">
+            <div class="slider-value-display"><span id="trainDaysVal">—</span> <span class="slider-unit">dni</span></div>
+            <input type="range" id="trainDaysSlider" class="forge-slider" min="2" max="6" step="1" oninput="updateSlider('trainDays')" />
+            <div class="slider-ticks"><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
           </div>
         </div>
 
@@ -72,11 +70,10 @@
 
         <div class="form-section">
           <label class="form-label">Czas na trening</label>
-          <div class="toggle-group" id="timeGroup">
-            <button type="button" class="toggle-btn" data-val="30">30 min</button>
-            <button type="button" class="toggle-btn" data-val="45">45 min</button>
-            <button type="button" class="toggle-btn" data-val="60">60 min</button>
-            <button type="button" class="toggle-btn" data-val="90">90 min</button>
+          <div class="slider-wrap">
+            <div class="slider-value-display"><span id="timeVal">—</span> <span class="slider-unit">min</span></div>
+            <input type="range" id="timeSlider" class="forge-slider" min="30" max="120" step="15" oninput="updateSlider('time')" />
+            <div class="slider-ticks"><span>30</span><span>45</span><span>60</span><span>75</span><span>90</span><span>105</span><span>120</span></div>
           </div>
         </div>
 
@@ -110,19 +107,10 @@
 
         <div class="form-section">
           <label class="form-label">Poziom zaawansowania</label>
-          <div class="level-select" id="levelGroup">
-            <div class="level-option" data-val="początkujący">
-              <div class="level-bar"><span class="f"></span><span class="e"></span><span class="e"></span></div>
-              <span>Początkujący</span>
-            </div>
-            <div class="level-option" data-val="średnio zaawansowany">
-              <div class="level-bar"><span class="f"></span><span class="f"></span><span class="e"></span></div>
-              <span>Średni</span>
-            </div>
-            <div class="level-option" data-val="zaawansowany">
-              <div class="level-bar"><span class="f"></span><span class="f"></span><span class="f"></span></div>
-              <span>Zaawansowany</span>
-            </div>
+          <div class="slider-wrap">
+            <div class="slider-value-display level-display"><span id="levelVal">—</span></div>
+            <input type="range" id="levelSlider" class="forge-slider" min="0" max="2" step="1" oninput="updateSlider('level')" />
+            <div class="slider-ticks"><span>Początkujący</span><span>Średni</span><span>Zaawansowany</span></div>
           </div>
         </div>
 

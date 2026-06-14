@@ -1,10 +1,22 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/generate.js", "use": "@vercel/node" }
-  ],
+  "functions": {
+    "api/generate.js": {
+      "runtime": "@vercel/node@3.0.0"
+    }
+  },
   "routes": [
-    { "src": "/api/generate", "dest": "/api/generate.js" },
-    { "src": "/(.*)", "dest": "/$1" }
+    {
+      "src": "/api/generate",
+      "dest": "/api/generate.js"
+    },
+    {
+      "src": "/(.*\\.(css|js|ico|png|jpg|svg|woff2?))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }

@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/generate.js": {
-      "runtime": "@vercel/node@4.x"
-    }
-  },
   "routes": [
     {
       "src": "/api/generate",

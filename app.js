@@ -1,24 +1,22 @@
 /* =====================================================
-   FORGE AI — App Logic (Vercel Backend)
+   FORGE AI — App Logic v2
    ===================================================== */
 
-// ── State ──────────────────────────────────────────────
 let currentMode = 'plan';
 let currentPlanData = null;
 let activeDay = null;
 
-const DAYS_PL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
-const DAYS_SHORT = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Nd'];
+const DAYS_PL  = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
+const DAYS_SHORT = ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'];
 
-const LOADING_MESSAGES = [
+const LOADING_MSGS = [
   'Analizuję Twoje parametry...',
   'Dobieranie optymalnych ćwiczeń...',
   'AI układa Twój plan...',
   'Obliczam objętość treningową...',
   'Finalizuję plan...',
 ];
-
-const LOADING_DIET_MESSAGES = [
+const LOADING_DIET_MSGS = [
   'Obliczam podstawową przemianę materii...',
   'Przeliczam zapotrzebowanie kaloryczne...',
   'Dostosowuję makroskładniki do celu...',
@@ -26,30 +24,22 @@ const LOADING_DIET_MESSAGES = [
   'Finalizuję plan diety...',
 ];
 
-// ── Mode Switcher ──────────────────────────────────────
+// ── Mode Switcher ───────────────────────────────────────
 function switchMode(mode) {
   currentMode = mode;
-
-  document.querySelectorAll('.mode-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.mode === mode);
-  });
-
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
   document.getElementById('planForm').classList.toggle('active', mode === 'plan');
   document.getElementById('dietForm').classList.toggle('active', mode === 'diet');
-
-  if (mode === 'plan') {
-    document.getElementById('formTitle').textContent = 'Skonfiguruj Plan Treningowy';
-    document.getElementById('formSubtitle').textContent = 'Wypełnij poniższe parametry, a AI ułoży dla Ciebie optymalny plan';
-  } else {
-    document.getElementById('formTitle').textContent = 'Skonfiguruj Plan Diety';
-    document.getElementById('formSubtitle').textContent = 'Podaj swoje dane, a AI wyliczy idealne makroskładniki dla Twojego celu';
-  }
-
+  document.getElementById('formTitle').textContent    = mode === 'plan' ? 'Skonfiguruj Plan Treningowy' : 'Skonfiguruj Plan Diety';
+  document.getElementById('formSubtitle').textContent = mode === 'plan'
+    ? 'Wypełnij poniższe parametry, a AI ułoży dla Ciebie optymalny plan'
+    : 'Podaj swoje dane, a AI wyliczy idealne makroskładniki dla Twojego celu';
   resetResults();
 }
 
-// ── Toggle Groups ──────────────────────────────────────
+// ── Toggle Groups Init ──────────────────────────────────
 function initToggleGroups() {
+  // single-select toggle buttons
   document.querySelectorAll('.toggle-group').forEach(group => {
     group.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -59,110 +49,125 @@ function initToggleGroups() {
     });
   });
 
+  // single-select card options
   document.querySelectorAll('.card-select').forEach(group => {
-    group.querySelectorAll('.card-option').forEach(option => {
-      option.addEventListener('click', () => {
+    group.querySelectorAll('.card-option').forEach(opt => {
+      opt.addEventListener('click', () => {
         group.querySelectorAll('.card-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
+        opt.classList.add('active');
       });
     });
   });
 
+  // multi-select tags
   document.querySelectorAll('.tag-select').forEach(group => {
     group.querySelectorAll('.tag-btn').forEach(tag => {
       tag.addEventListener('click', () => tag.classList.toggle('active'));
     });
   });
 
+  // single-select level
   document.querySelectorAll('.level-select').forEach(group => {
-    group.querySelectorAll('.level-option').forEach(option => {
-      option.addEventListener('click', () => {
+    group.querySelectorAll('.level-option').forEach(opt => {
+      opt.addEventListener('click', () => {
         group.querySelectorAll('.level-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
+        opt.classList.add('active');
       });
     });
   });
 
+  // single-select split
   document.querySelectorAll('.split-select').forEach(group => {
-    group.querySelectorAll('.split-option').forEach(option => {
-      option.addEventListener('click', () => {
+    group.querySelectorAll('.split-option').forEach(opt => {
+      opt.addEventListener('click', () => {
         group.querySelectorAll('.split-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
+        opt.classList.add('active');
       });
     });
   });
 
+  // single-select activity
   document.querySelectorAll('.activity-select').forEach(group => {
-    group.querySelectorAll('.activity-option').forEach(option => {
-      option.addEventListener('click', () => {
+    group.querySelectorAll('.activity-option').forEach(opt => {
+      opt.addEventListener('click', () => {
         group.querySelectorAll('.activity-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
+        opt.classList.add('active');
       });
     });
   });
 }
 
-// ── Read Form Values ───────────────────────────────────
+// ── Read Values ─────────────────────────────────────────
+function getToggleVal(groupId)   { const el = document.querySelector(`#${groupId} .toggle-btn.active`);  return el ? el.dataset.val : null; }
+function getCardVal(groupId)     { const el = document.querySelector(`#${groupId} .card-option.active`); return el ? el.dataset.val : null; }
+function getTagVals(groupId)     { return Array.from(document.querySelectorAll(`#${groupId} .tag-btn.active`)).map(e => e.dataset.val); }
+function getLevelVal()           { const el = document.querySelector('.level-option.active');  return el ? el.dataset.val : null; }
+function getSplitVal()           { const el = document.querySelector('.split-option.active');  return el ? el.dataset.val : null; }
+function getActivityVal()        { const el = document.querySelector('.activity-option.active'); return el ? el.dataset.val : null; }
+
 function getPlanFormValues() {
   return {
-    trainDays: getActiveToggleValue('#trainDaysGroup'),
-    goal: getActiveCardValue('#goalGroup'),
-    time: getActiveToggleValue('#timeGroup'),
-    muscles: getActiveTagValues('#muscleGroup'),
-    injuries: getActiveTagValues('#injuryGroup'),
-    level: getActiveSingleValue('.level-option'),
-    split: getActiveSingleValue('.split-option'),
-    equipment: getActiveTagValues('#equipGroup'),
+    trainDays : getToggleVal('trainDaysGroup'),
+    goal      : getCardVal('goalGroup'),
+    time      : getToggleVal('timeGroup'),
+    muscles   : getTagVals('muscleGroup'),
+    injuries  : getTagVals('injuryGroup'),
+    level     : getLevelVal(),
+    split     : getSplitVal(),
+    equipment : getTagVals('equipGroup'),
   };
 }
 
 function getDietFormValues() {
   return {
-    gender: getActiveCardValue('#genderGroup'),
-    age: document.getElementById('ageInput').value,
-    weight: document.getElementById('weightInput').value,
-    height: document.getElementById('heightInput').value,
-    activity: getActiveSingleValue('.activity-option'),
-    goal: getActiveCardValue('#dietGoalGroup'),
+    gender   : getCardVal('genderGroup'),
+    age      : document.getElementById('ageInput').value.trim(),
+    weight   : document.getElementById('weightInput').value.trim(),
+    height   : document.getElementById('heightInput').value.trim(),
+    activity : getActivityVal(),
+    goal     : getCardVal('dietGoalGroup'),
   };
 }
 
-function getActiveToggleValue(groupSelector) {
-  const el = document.querySelector(groupSelector + ' .toggle-btn.active');
-  return el ? el.dataset.val : '';
+// ── Validation ──────────────────────────────────────────
+function validatePlan(v) {
+  if (!v.trainDays) return 'Wybierz liczbę treningów w tygodniu';
+  if (!v.goal)      return 'Wybierz cel treningowy';
+  if (!v.time)      return 'Wybierz czas treningu';
+  if (!v.muscles.length) return 'Wybierz co najmniej jedną partię mięśniową';
+  if (!v.level)     return 'Wybierz poziom zaawansowania';
+  if (!v.split)     return 'Wybierz preferowany split';
+  if (!v.equipment.length) return 'Wybierz dostępny sprzęt';
+  return null;
 }
 
-function getActiveCardValue(groupSelector) {
-  const el = document.querySelector(groupSelector + ' .card-option.active');
-  return el ? el.dataset.val : '';
+function validateDiet(v) {
+  if (!v.gender)   return 'Wybierz płeć';
+  if (!v.age)      return 'Wpisz wiek';
+  if (!v.weight)   return 'Wpisz wagę';
+  if (!v.height)   return 'Wpisz wzrost';
+  if (!v.activity) return 'Wybierz poziom aktywności';
+  if (!v.goal)     return 'Wybierz cel diety';
+  return null;
 }
 
-function getActiveTagValues(groupSelector) {
-  return Array.from(document.querySelectorAll(groupSelector + ' .tag-btn.active'))
-    .map(e => e.dataset.val);
-}
-
-function getActiveSingleValue(selector) {
-  const el = document.querySelector(selector + '.active');
-  return el ? el.dataset.val : '';
-}
-
-// ── Loading Cycle ──────────────────────────────────────
+// ── Loading ─────────────────────────────────────────────
 let loadingInterval;
 
-function startLoading(isDiet = false) {
-  const msgs = isDiet ? LOADING_DIET_MESSAGES : LOADING_MESSAGES;
+function startLoading(isDiet) {
+  const msgs = isDiet ? LOADING_DIET_MSGS : LOADING_MSGS;
   let i = 0;
-  document.getElementById('loadingMessage').textContent = msgs[0];
+  const el = document.getElementById('loadingMessage');
+  if (el) el.textContent = msgs[0];
   loadingInterval = setInterval(() => {
     i = (i + 1) % msgs.length;
-    document.getElementById('loadingMessage').textContent = msgs[i];
+    const el = document.getElementById('loadingMessage');
+    if (el) el.textContent = msgs[i];
   }, 2000);
 }
 
 function stopLoading() { clearInterval(loadingInterval); }
 
-// ── Show/Hide States ───────────────────────────────────
 function showLoading(isDiet) {
   document.getElementById('emptyState').classList.add('hidden');
   document.getElementById('loadingState').classList.remove('hidden');
@@ -193,108 +198,104 @@ function resetResults() {
   activeDay = null;
 }
 
-// ── Generate Plan ──────────────────────────────────────
+// ── Generate Plan ───────────────────────────────────────
 async function generatePlan() {
   const vals = getPlanFormValues();
-
-  if (!vals.muscles.length) {
-    showToast('Wybierz co najmniej jedną partię mięśniową');
-    return;
-  }
+  const err  = validatePlan(vals);
+  if (err) { showToast(err); return; }
 
   showLoading(false);
-
   try {
-    const result = await callAPI(buildPlanPrompt(vals));
-    const data = parseJSON(result);
-    if (!data) throw new Error('Błąd parsowania odpowiedzi AI. Spróbuj ponownie.');
+    const raw  = await callAPI(buildPlanPrompt(vals));
+    const data = parseJSON(raw);
+    if (!data || !Array.isArray(data.days)) throw new Error('Nieprawidłowa odpowiedź AI — spróbuj ponownie.');
     currentPlanData = data;
     renderPlanResults(data, vals);
     showPlanResults();
-  } catch (err) {
+  } catch (e) {
     stopLoading();
-    showError(err.message);
+    showError(e.message);
   }
 }
 
-// ── Generate Diet ──────────────────────────────────────
+// ── Generate Diet ───────────────────────────────────────
 async function generateDiet() {
   const vals = getDietFormValues();
-
-  if (!vals.age || !vals.weight || !vals.height) {
-    showToast('Uzupełnij wiek, wagę i wzrost');
-    return;
-  }
+  const err  = validateDiet(vals);
+  if (err) { showToast(err); return; }
 
   showLoading(true);
-
   try {
-    const result = await callAPI(buildDietPrompt(vals));
-    const data = parseJSON(result);
-    if (!data) throw new Error('Błąd parsowania odpowiedzi AI. Spróbuj ponownie.');
+    const raw  = await callAPI(buildDietPrompt(vals));
+    const data = parseJSON(raw);
+    if (!data || !data.target_kcal) throw new Error('Nieprawidłowa odpowiedź AI — spróbuj ponownie.');
     renderDietResults(data, vals);
     showDietResults();
-  } catch (err) {
+  } catch (e) {
     stopLoading();
-    showError(err.message);
+    showError(e.message);
   }
 }
 
-// ── Backend API Call (klucz ukryty na serwerze) ────────
+// ── API Call ────────────────────────────────────────────
 async function callAPI(prompt) {
-  const response = await fetch('/api/generate', {
+  const res = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt,
-      systemPrompt: 'Jesteś ekspertem fitness i dietetykiem. Zawsze odpowiadaj TYLKO w formacie JSON, bez żadnych dodatkowych komentarzy, bez markdown, bez backticks. Twoje odpowiedzi muszą być kompletne i szczegółowe.',
-    }),
+    body: JSON.stringify({ prompt }),
   });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err?.error || `Błąd serwera: ${response.status}`);
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e?.error || `Błąd serwera: ${res.status}`);
   }
-
-  const data = await response.json();
-  return data.result;
+  const d = await res.json();
+  return d.result;
 }
 
 function parseJSON(text) {
-  try {
-    return JSON.parse(text.replace(/```json|```/g, '').trim());
-  } catch {
-    const match = text.match(/\{[\s\S]*\}/);
-    if (match) { try { return JSON.parse(match[0]); } catch { return null; } }
+  if (!text) return null;
+  try { return JSON.parse(text.replace(/```json|```/g, '').trim()); }
+  catch {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (m) try { return JSON.parse(m[0]); } catch { return null; }
     return null;
   }
 }
 
-// ── Prompts ────────────────────────────────────────────
-function buildPlanPrompt(vals) {
-  return `Stwórz szczegółowy plan treningowy na siłownię dla osoby z następującymi parametrami:
+// ── Prompts ─────────────────────────────────────────────
+function buildPlanPrompt(v) {
+  const injuryNote = v.injuries.length
+    ? `KONTUZJE (BEZWZGLĘDNIE unikaj ćwiczeń obciążających te partie): ${v.injuries.join(', ')}.`
+    : 'Brak kontuzji.';
 
-- Liczba treningów w tygodniu: ${vals.trainDays}
-- Cel: ${vals.goal}
-- Czas treningu: ${vals.time}
-- Partie mięśniowe: ${vals.muscles.join(', ')}
-- Kontuzje/ograniczenia: ${vals.injuries.length ? vals.injuries.join(', ') : 'brak'}
-- Poziom: ${vals.level}
-- Split: ${vals.split}
-- Dostępny sprzęt: ${vals.equipment.join(', ')}
+  return `Jesteś doświadczonym trenerem personalnym. Stwórz SZCZEGÓŁOWY plan treningowy według poniższych wymagań.
 
-Odpowiedz TYLKO w JSON według poniższego schematu:
+=== WYMAGANIA (MUSISZ ICH PRZESTRZEGAĆ) ===
+SPLIT: "${v.split}" — każdy dzień treningowy MUSI być zgodny z tym splitem.
+  - Jeśli "Full Body": każdy dzień treningowy = ćwiczenia na CAŁE ciało (klatka+plecy+nogi+barki w jednym treningu)
+  - Jeśli "Push/Pull/Legs": Push = klatka+barki+triceps, Pull = plecy+biceps, Legs = nogi
+  - Jeśli "Upper/Lower": Upper = górna połowa ciała, Lower = dolna połowa ciała
+  - Jeśli "Bro Split": każdy dzień = JEDNA partia mięśniowa
+LICZBA DNI TRENINGOWYCH: dokładnie ${v.trainDays} (reszta z 7 to dni odpoczynku)
+CEL: ${v.goal}
+CZAS TRENINGU: ${v.time} minut
+PARTIE DO TRENOWANIA: ${v.muscles.join(', ')} — używaj TYLKO tych partii
+${injuryNote}
+POZIOM: ${v.level}
+SPRZĘT: ${v.equipment.join(', ')} — używaj TYLKO tego sprzętu
+
+=== FORMAT ODPOWIEDZI ===
+Odpowiedz WYŁĄCZNIE w JSON, zero komentarzy poza JSON:
 
 {
-  "summary": "Krótki opis planu (2-3 zdania)",
-  "split_name": "Nazwa splitu",
-  "total_weeks": "Zalecana liczba tygodni stosowania planu",
+  "split_name": "nazwa splitu",
+  "summary": "krótki opis planu",
   "days": [
     {
       "day_name": "Poniedziałek",
       "is_rest": false,
-      "muscle_focus": "Klatka i Triceps",
-      "estimated_time": "60 minut",
+      "muscle_focus": "Klatka + Triceps",
+      "estimated_time": "60",
       "exercises": [
         {
           "number": 1,
@@ -302,9 +303,9 @@ Odpowiedz TYLKO w JSON według poniższego schematu:
           "target_muscle": "Klatka piersiowa",
           "sets": 4,
           "reps": "8-10",
-          "rir": "2 (2 powtórzenia w zapasie)",
+          "rir": 2,
           "rest_seconds": 120,
-          "notes": "Łokcie pod kątem 45°, pełny zakres ruchu"
+          "notes": "Łokcie pod kątem 45°"
         }
       ]
     },
@@ -316,26 +317,27 @@ Odpowiedz TYLKO w JSON według poniższego schematu:
       "exercises": []
     }
   ],
-  "tips": ["Wskazówka 1", "Wskazówka 2", "Wskazówka 3"]
+  "tips": ["wskazówka 1", "wskazówka 2", "wskazówka 3"]
 }
 
-Stwórz dokładnie ${vals.trainDays} dni treningowych i odpowiednią liczbę dni odpoczynku, łącznie 7 dni (pełny tydzień). Każdy dzień treningowy powinien mieć 5-8 ćwiczeń. Uwzględnij kontuzje i dostępny sprzęt.`;
+WAŻNE:
+- "rir" to LICZBA (integer), np. 2, nie tekst
+- Łącznie DOKŁADNIE 7 elementów w "days" (${v.trainDays} treningów + ${7 - parseInt(v.trainDays)} odpoczynki)
+- Każdy trening: 5-8 ćwiczeń
+- Ćwiczenia muszą być realistyczne dla podanego sprzętu`;
 }
 
-function buildDietPrompt(vals) {
-  return `Stwórz szczegółowy plan diety dla osoby z następującymi parametrami:
+function buildDietPrompt(v) {
+  return `Jesteś dietetykiem sportowym. Oblicz plan diety dla:
+Płeć: ${v.gender}, Wiek: ${v.age} lat, Waga: ${v.weight} kg, Wzrost: ${v.height} cm
+Aktywność: ${v.activity}, Cel: ${v.goal}
 
-- Płeć: ${vals.gender}
-- Wiek: ${vals.age} lat
-- Waga: ${vals.weight} kg
-- Wzrost: ${vals.height} cm
-- Aktywność: ${vals.activity}
-- Cel: ${vals.goal}
+Oblicz BMR (Mifflin-St Jeor), TDEE i docelowe kalorie:
+- masa: TDEE + 300 kcal
+- redukcja: TDEE - 500 kcal
+- utrzymanie: TDEE
 
-Oblicz BMR metodą Mifflin-St Jeor, następnie TDEE z odpowiednim mnożnikiem aktywności, a potem dostosuj kalorie do celu.
-
-Odpowiedz TYLKO w JSON według poniższego schematu:
-
+Odpowiedz WYŁĄCZNIE w JSON:
 {
   "bmr": 1800,
   "tdee": 2500,
@@ -343,7 +345,7 @@ Odpowiedz TYLKO w JSON według poniższego schematu:
   "protein_g": 170,
   "fat_g": 80,
   "carbs_g": 320,
-  "goal_description": "Krótki opis strategii (2-3 zdania)",
+  "goal_description": "opis strategii",
   "meals": [
     {
       "meal_number": 1,
@@ -353,45 +355,44 @@ Odpowiedz TYLKO w JSON według poniższego schematu:
       "protein_g": 40,
       "fat_g": 20,
       "carbs_g": 75,
-      "example_foods": ["Owsianka 80g", "Białko jaj 4 sztuki", "Banan 1 sztuka", "Orzechy włoskie 20g"]
+      "example_foods": ["Owsianka 80g", "4 jajka", "Banan"]
     }
   ],
   "hydration_ml": 3000,
-  "supplements": ["Kreatyna 5g/dzień", "Witamina D3 2000 IU"],
-  "tips": ["Tip 1", "Tip 2", "Tip 3"]
+  "supplements": ["Kreatyna 5g/dzień"],
+  "tips": ["tip 1", "tip 2", "tip 3"]
+}
+Stwórz 5 posiłków. Suma kcal posiłków = target_kcal.`;
 }
 
-Stwórz 5 posiłków na dzień. Upewnij się, że suma kalorii posiłków odpowiada target_kcal.`;
-}
-
-// ── Render Plan ────────────────────────────────────────
+// ── Render Plan ─────────────────────────────────────────
 function renderPlanResults(data, vals) {
-  document.getElementById('planMeta').textContent =
-    `${data.split_name} • ${vals.trainDays}x/tydzień • Cel: ${vals.goal}`;
+  const metaEl = document.getElementById('planMeta');
+  if (metaEl) metaEl.textContent = `${data.split_name || vals.split} • ${vals.trainDays}x/tydzień • ${vals.goal}`;
 
   const nav = document.getElementById('daysNav');
   nav.innerHTML = '';
   data.days.forEach((day, i) => {
     const btn = document.createElement('button');
     btn.className = 'day-btn' + (day.is_rest ? ' rest' : '');
-    btn.textContent = DAYS_SHORT[i] || day.day_name.slice(0, 3);
+    btn.textContent = DAYS_SHORT[i] || `D${i+1}`;
+    btn.title = day.is_rest ? 'Odpoczynek' : (day.muscle_focus || '');
     if (!day.is_rest) btn.addEventListener('click', () => selectDay(i, data));
     nav.appendChild(btn);
   });
 
-  const firstTraining = data.days.findIndex(d => !d.is_rest);
-  if (firstTraining >= 0) selectDay(firstTraining, data);
+  const first = data.days.findIndex(d => !d.is_rest);
+  if (first >= 0) selectDay(first, data);
 }
 
 function selectDay(index, data) {
   activeDay = index;
   const day = data.days[index];
 
-  document.querySelectorAll('.day-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', i === index);
-  });
+  document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('active', i === index));
 
   const content = document.getElementById('dayContent');
+  if (!content) return;
 
   if (day.is_rest) {
     content.innerHTML = `
@@ -404,83 +405,83 @@ function selectDay(index, data) {
   }
 
   let rows = '';
-  day.exercises.forEach((ex, i) => {
+  (day.exercises || []).forEach((ex, i) => {
+    // RIR: wyciągamy tylko liczbę
+    const rirRaw = ex.rir !== undefined && ex.rir !== null ? ex.rir : 2;
+    const rirNum = typeof rirRaw === 'number' ? rirRaw : parseInt(String(rirRaw).match(/\d+/)?.[0] ?? '2');
+
     rows += `
       <tr>
-        <td><div class="ex-num">${ex.number || i + 1}</div></td>
+        <td><div class="ex-num">${ex.number || i+1}</div></td>
         <td>
-          <div class="ex-name">${ex.name}</div>
+          <div class="ex-name">${ex.name || ''}</div>
           <div class="ex-muscle">${ex.target_muscle || ''}</div>
         </td>
-        <td><span class="ex-badge">${ex.sets} serie</span></td>
-        <td><span class="ex-badge">${ex.reps} powt.</span></td>
-        <td><span class="ex-badge rpe">${ex.rir || 'RIR 2'}</span></td>
+        <td><span class="ex-badge">${ex.sets || 3} serie</span></td>
+        <td><span class="ex-badge">${ex.reps || '8-12'}</span></td>
+        <td><span class="ex-badge rpe">RIR ${rirNum}</span></td>
         <td><span class="ex-badge">${formatRest(ex.rest_seconds)}</span></td>
       </tr>`;
     if (ex.notes) {
-      rows += `<tr class="rest-row"><td colspan="6" style="text-align:left;padding:8px 16px;font-size:12px;color:var(--text-muted)">💡 ${ex.notes}</td></tr>`;
+      rows += `<tr><td colspan="6" style="padding:4px 16px 10px;font-size:12px;color:var(--text-muted)">💡 ${ex.notes}</td></tr>`;
     }
   });
 
+  const firstTrainingIdx = data.days.findIndex(d => !d.is_rest);
+  const showTips = index === firstTrainingIdx;
+
   content.innerHTML = `
     <div class="day-info">
-      <div class="day-title">${DAYS_PL[activeDay] || day.day_name} — ${day.muscle_focus || ''}</div>
-      <div class="day-duration">⏱ ${day.estimated_time || '~60 min'}</div>
+      <div class="day-title">${DAYS_PL[index] || day.day_name} — ${day.muscle_focus || ''}</div>
+      <div class="day-duration">⏱ ${day.estimated_time ? day.estimated_time + ' min' : '~60 min'}</div>
     </div>
     <table class="exercise-table">
       <thead>
-        <tr>
-          <th>#</th><th>Ćwiczenie</th><th>Serie</th><th>Powtórzenia</th><th>Zapas (RIR)</th><th>Przerwa</th>
-        </tr>
+        <tr><th>#</th><th>Ćwiczenie</th><th>Serie</th><th>Powtórzenia</th><th>Zapas</th><th>Przerwa</th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    ${renderTips(currentPlanData.tips, index === data.days.findIndex(d => !d.is_rest))}`;
-}
-
-function formatRest(seconds) {
-  if (!seconds) return '90s';
-  return seconds >= 60 ? Math.round(seconds / 60) + ' min' : seconds + 's';
-}
-
-function renderTips(tips, show) {
-  if (!show || !tips?.length) return '';
-  return `
+    ${showTips && currentPlanData?.tips?.length ? `
     <div class="advice-grid" style="margin-top:20px">
-      ${tips.map(tip => `
+      ${currentPlanData.tips.map(t => `
         <div class="advice-card">
           <div class="advice-icon">💡</div>
-          <div class="advice-text">${tip}</div>
+          <div class="advice-text">${t}</div>
         </div>`).join('')}
-    </div>`;
+    </div>` : ''}`;
 }
 
-// ── Render Diet ────────────────────────────────────────
+function formatRest(s) {
+  if (!s) return '90s';
+  return s >= 60 ? Math.round(s / 60) + ' min' : s + 's';
+}
+
+// ── Render Diet ─────────────────────────────────────────
 function renderDietResults(data, vals) {
-  document.getElementById('dietMeta').textContent =
-    `${vals.gender} • ${vals.age} lat • ${vals.weight} kg • Cel: ${vals.goal}`;
+  const metaEl = document.getElementById('dietMeta');
+  if (metaEl) metaEl.textContent = `${vals.gender} • ${vals.age} lat • ${vals.weight} kg • cel: ${vals.goal}`;
 
   const content = document.getElementById('dietContent');
+  if (!content) return;
 
   let mealRows = '';
-  (data.meals || []).forEach(meal => {
-    const foods = Array.isArray(meal.example_foods) ? meal.example_foods.join(', ') : '';
+  (data.meals || []).forEach(m => {
+    const foods = Array.isArray(m.example_foods) ? m.example_foods.join(', ') : '';
     mealRows += `
       <tr>
         <td>
-          <div class="meal-name">${meal.meal_name}</div>
-          <div class="meal-time">⏰ ${meal.suggested_time || ''}</div>
+          <div class="meal-name">${m.meal_name}</div>
+          <div class="meal-time">⏰ ${m.suggested_time || ''}</div>
         </td>
-        <td class="meal-kcal">${meal.kcal} kcal</td>
-        <td class="meal-macro">${meal.protein_g}g</td>
-        <td class="meal-macro">${meal.fat_g}g</td>
-        <td class="meal-macro">${meal.carbs_g}g</td>
+        <td class="meal-kcal">${m.kcal} kcal</td>
+        <td class="meal-macro">${m.protein_g}g</td>
+        <td class="meal-macro">${m.fat_g}g</td>
+        <td class="meal-macro">${m.carbs_g}g</td>
       </tr>
-      ${foods ? `<tr style="background:rgba(255,255,255,0.01)"><td colspan="5" style="padding:6px 14px 12px;font-size:12px;color:var(--text-muted)">🍽 ${foods}</td></tr>` : ''}`;
+      ${foods ? `<tr><td colspan="5" style="padding:4px 14px 10px;font-size:12px;color:var(--text-muted)">🍽 ${foods}</td></tr>` : ''}`;
   });
 
-  const supplements = (data.supplements || [])
-    .map(s => `<span class="tag-btn active" style="cursor:default">${s}</span>`).join('');
+  const supps = (data.supplements || []).map(s => `<span class="tag-btn active" style="cursor:default">${s}</span>`).join('');
 
   content.innerHTML = `
     <div class="diet-macros">
@@ -520,54 +521,48 @@ function renderDietResults(data, vals) {
       <div class="advice-card" style="flex:1">
         <div class="advice-icon">🔥</div>
         <div class="advice-title">BMR</div>
-        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent);margin:4px 0">${data.bmr} <span style="font-family:Inter,sans-serif;font-size:13px;color:var(--text-secondary)">kcal</span></div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent)">${data.bmr} <span style="font-family:Inter,sans-serif;font-size:13px;color:var(--text-secondary)">kcal</span></div>
       </div>
       <div class="advice-card" style="flex:1">
         <div class="advice-icon">📊</div>
         <div class="advice-title">TDEE</div>
-        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent);margin:4px 0">${data.tdee} <span style="font-family:Inter,sans-serif;font-size:13px;color:var(--text-secondary)">kcal</span></div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent)">${data.tdee} <span style="font-family:Inter,sans-serif;font-size:13px;color:var(--text-secondary)">kcal</span></div>
       </div>
       <div class="advice-card" style="flex:1">
         <div class="advice-icon">💧</div>
         <div class="advice-title">Nawodnienie</div>
-        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent);margin:4px 0">${data.hydration_ml ? (data.hydration_ml/1000).toFixed(1) : '2.5'} <span style="font-family:Inter,sans-serif;font-size:13px;color:var(--text-secondary)">L</span></div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent)">${data.hydration_ml ? (data.hydration_ml/1000).toFixed(1) : '2.5'} <span style="font-family:Inter,sans-serif;font-size:13px;color:var(--text-secondary)">L</span></div>
       </div>
     </div>
 
     <div class="meal-section">
       <div class="meal-section-title">Plan posiłków na dzień</div>
       <table class="meal-table">
-        <thead>
-          <tr><th>Posiłek</th><th>Kalorie</th><th>Białko</th><th>Tłuszcze</th><th>Węgle</th></tr>
-        </thead>
+        <thead><tr><th>Posiłek</th><th>Kalorie</th><th>Białko</th><th>Tłuszcze</th><th>Węgle</th></tr></thead>
         <tbody>${mealRows}</tbody>
       </table>
     </div>
 
-    ${supplements ? `
-    <div class="meal-section">
-      <div class="meal-section-title">Suplementacja</div>
-      <div class="tag-select">${supplements}</div>
-    </div>` : ''}
+    ${supps ? `<div class="meal-section"><div class="meal-section-title">Suplementacja</div><div class="tag-select">${supps}</div></div>` : ''}
 
     ${data.tips?.length ? `
     <div class="meal-section">
       <div class="meal-section-title">Wskazówki</div>
       <div class="advice-grid">
-        ${data.tips.map(tip => `
-          <div class="advice-card">
-            <div class="advice-icon">💡</div>
-            <div class="advice-text">${tip}</div>
-          </div>`).join('')}
+        ${data.tips.map(t => `<div class="advice-card"><div class="advice-icon">💡</div><div class="advice-text">${t}</div></div>`).join('')}
       </div>
     </div>` : ''}`;
 }
 
-// ── Error / Toast ──────────────────────────────────────
+// ── Error / Toast ───────────────────────────────────────
 function showError(message) {
-  document.getElementById('emptyState').classList.add('hidden');
-  document.getElementById('loadingState').classList.add('hidden');
+  stopLoading();
+  ['emptyState','loadingState','planResults','dietResults'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
   const panel = document.getElementById('planResults');
+  if (!panel) return;
   panel.classList.remove('hidden');
   panel.innerHTML = `
     <div class="error-card">
@@ -575,29 +570,23 @@ function showError(message) {
       <div class="error-title">Ups! Coś poszło nie tak</div>
       <div class="error-text">${message}</div>
       <div style="margin-top:16px">
-        <button class="reset-btn" onclick="resetResults()" style="margin:0 auto">↺ Wróć i spróbuj ponownie</button>
+        <button class="reset-btn" onclick="resetResults()">↺ Wróć i spróbuj ponownie</button>
       </div>
     </div>`;
 }
 
 function showToast(msg) {
   const t = document.createElement('div');
-  t.style.cssText = `
-    position:fixed;bottom:24px;right:24px;z-index:9999;
-    background:#1E1E2E;border:1px solid rgba(255,77,0,0.4);
-    color:#E8E8F0;padding:12px 20px;border-radius:10px;
-    font-size:14px;font-weight:600;font-family:Inter,sans-serif;
-    box-shadow:0 8px 30px rgba(0,0,0,0.5);animation:slideIn 0.3s ease;
-  `;
+  t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;
+    background:#1E1E2E;border:1px solid rgba(255,77,0,0.4);color:#E8E8F0;
+    padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;
+    font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);`;
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => t.remove(), 3500);
 }
 
-// ── Init ───────────────────────────────────────────────
+// ── Init ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initToggleGroups();
-  const style = document.createElement('style');
-  style.textContent = `@keyframes slideIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }`;
-  document.head.appendChild(style);
 });

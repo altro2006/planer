@@ -107,7 +107,7 @@ function updateSlider(type) {
     const sl = document.getElementById('trainDaysSlider');
     const val = parseInt(sl.value);
     document.getElementById('trainDaysVal').textContent = val;
-    const pct = ((val - 2) / (6 - 2)) * 100;
+    const pct = ((val - 2) / (7 - 2)) * 100;
     sl.style.setProperty('--pct', pct + '%');
     sl.dataset.active = '1';
   } else if (type === 'time') {
@@ -365,7 +365,7 @@ Odpowiedz WYŁĄCZNIE w JSON, zero komentarzy poza JSON:
 
 WAŻNE:
 - "rir" to LICZBA (integer), np. 2, nie tekst
-- Łącznie DOKŁADNIE 7 elementów w "days" (${v.trainDays} treningów + ${7 - parseInt(v.trainDays)} odpoczynki)
+- Łącznie DOKŁADNIE 7 elementów w "days" (${v.trainDays} treningów + ${7 - parseInt(v.trainDays)} dni odpoczynku)
 - Każdy trening: 5-8 ćwiczeń
 - Ćwiczenia muszą być realistyczne dla podanego sprzętu`;
 }

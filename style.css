@@ -1048,12 +1048,7 @@ html, body {
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-.forge-slider:not([data-active]) {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.forge-slider[data-active] {
+.forge-slider {
   opacity: 1;
   pointer-events: auto;
 }

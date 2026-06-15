@@ -57,10 +57,16 @@ html, body {
 }
 
 .header-inner {
-  display: flex; align-items: center; gap: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   height: 64px;
   padding: 0 16px;
 }
+
+.header-inner .logo { justify-self: start; }
+.header-inner .mode-switcher { justify-self: center; }
+.header-inner .header-auth { justify-self: end; }
 
 .logo {
   display: flex; align-items: center; gap: 8px;
@@ -1554,7 +1560,7 @@ html, body {
 }
 
 /* ===== PROFILE DROPDOWN ===== */
-.header-auth { position: relative; flex-shrink: 0; margin-left: auto; }
+.header-auth { position: relative; }
 
 .user-chip {
   display: flex; align-items: center; gap: 8px;

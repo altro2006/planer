@@ -28,15 +28,6 @@ const LOADING_DIET_MSGS = [
 function switchMode(mode) {
   currentMode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-
-  if (mode === 'profile') {
-    if (typeof showProfilePage === 'function') showProfilePage(true);
-    return;
-  }
-
-  // Hide profile page if switching away
-  if (typeof showProfilePage === 'function') showProfilePage(false);
-
   document.getElementById('planForm').classList.toggle('active', mode === 'plan');
   document.getElementById('dietForm').classList.toggle('active', mode === 'diet');
   document.getElementById('formTitle').textContent    = mode === 'plan' ? 'Skonfiguruj Plan Treningowy' : 'Skonfiguruj Plan Diety';

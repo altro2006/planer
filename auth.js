@@ -2,8 +2,6 @@
    FORGE AI — Auth (Supabase)
    ===================================================== */
 
-// ── Supabase init ───────────────────────────────────────
-// Wstaw tutaj swoje dane z Supabase Dashboard → Settings → API
 const SUPABASE_URL = 'https://uekuqxjbftnkbyirbtct.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_M9ofqItywB3xdO7HYTulYQ_iVhC_Fxg';
 
@@ -12,17 +10,17 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 
-// ── Init on load ────────────────────────────────────────
+// ── Init ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) handleUserLoggedIn(session.user);
+  if (session?.user) {
+    handleUserLoggedIn(session.user);
+  }
+  // else: auth screen is already visible by default
 
   sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
-      handleUserLoggedIn(session.user);
-    } else if (event === 'SIGNED_OUT') {
-      handleUserLoggedOut();
-    }
+    if (event === 'SIGNED_IN' && session?.user) handleUserLoggedIn(session.user);
+    else if (event === 'SIGNED_OUT') handleUserLoggedOut();
   });
 });
 
@@ -32,22 +30,19 @@ async function login() {
   const password = document.getElementById('loginPassword').value;
   const errEl    = document.getElementById('loginError');
 
+  clearAuthError('loginError');
   if (!email || !password) { showAuthError(errEl, 'Wypełnij email i hasło'); return; }
 
-  const btn = event.currentTarget;
-  setAuthLoading(btn, true);
+  const btn = document.getElementById('loginBtn');
+  setAuthLoading(btn, true, 'Logowanie...');
 
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  setAuthLoading(btn, false);
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  setAuthLoading(btn, false, 'Zaloguj się');
 
   if (error) {
-    const msg = error.message.includes('Invalid login') ? 'Nieprawidłowy email lub hasło' : error.message;
-    showAuthError(errEl, msg);
-    return;
+    showAuthError(errEl, error.message.includes('Invalid login') ? 'Nieprawidłowy email lub hasło' : error.message);
   }
-
-  closeAuthModal();
-  showToast('Zalogowano pomyślnie! Witaj z powrotem 👋');
+  // success handled by onAuthStateChange
 }
 
 // ── Register ────────────────────────────────────────────
@@ -57,138 +52,151 @@ async function register() {
   const password = document.getElementById('registerPassword').value;
   const errEl    = document.getElementById('registerError');
 
-  if (!name)                    { showAuthError(errEl, 'Wpisz swoje imię'); return; }
-  if (!email)                   { showAuthError(errEl, 'Wpisz adres email'); return; }
-  if (password.length < 6)      { showAuthError(errEl, 'Hasło musi mieć min. 6 znaków'); return; }
+  clearAuthError('registerError');
+  if (!name)               { showAuthError(errEl, 'Wpisz swoje imię'); return; }
+  if (!email)              { showAuthError(errEl, 'Wpisz adres email'); return; }
+  if (password.length < 6) { showAuthError(errEl, 'Hasło musi mieć min. 6 znaków'); return; }
 
-  const btn = event.currentTarget;
-  setAuthLoading(btn, true);
+  const btn = document.getElementById('registerBtn');
+  setAuthLoading(btn, true, 'Tworzenie konta...');
 
-  const { data, error } = await sb.auth.signUp({
-    email,
-    password,
+  const { error } = await sb.auth.signUp({
+    email, password,
     options: { data: { full_name: name } },
   });
-  setAuthLoading(btn, false);
+  setAuthLoading(btn, false, 'Utwórz konto');
 
   if (error) {
-    const msg = error.message.includes('already registered') ? 'Ten email jest już zarejestrowany' : error.message;
-    showAuthError(errEl, msg);
+    showAuthError(errEl, error.message.includes('already registered') ? 'Ten email jest już zarejestrowany' : error.message);
     return;
   }
 
-  closeAuthModal();
-  showToast('Konto utworzone! Sprawdź email w celu potwierdzenia 📧');
+  showAuthError(document.getElementById('registerError'), '✅ Sprawdź email — wyśliliśmy link potwierdzający!');
+  document.getElementById('registerError').style.color = 'var(--success)';
+  document.getElementById('registerError').style.borderColor = 'rgba(0,229,160,0.3)';
+  document.getElementById('registerError').style.background = 'rgba(0,229,160,0.08)';
+  document.getElementById('registerError').classList.remove('hidden');
 }
 
 // ── Logout ──────────────────────────────────────────────
 async function logout() {
   await sb.auth.signOut();
-  showToast('Wylogowano pomyślnie');
-  switchMode('plan');
 }
 
-// ── UI: user logged in ──────────────────────────────────
+// ── Logged In ───────────────────────────────────────────
 function handleUserLoggedIn(user) {
   currentUser = user;
-  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const name     = user.user_metadata?.full_name || user.email.split('@')[0];
   const initials = name.charAt(0).toUpperCase();
 
-  // Header: replace login button with user avatar
-  const authEl = document.getElementById('headerAuth');
-  if (authEl) {
-    authEl.innerHTML = `
-      <div class="user-chip" onclick="switchMode('profile')">
-        <div class="user-avatar">${initials}</div>
-        <span class="user-name">${name}</span>
-      </div>`;
-  }
+  // Switch screens
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
 
-  // Show profile tab
-  const tab = document.getElementById('profileTab');
-  if (tab) tab.classList.remove('hidden');
+  // Fill header chip
+  setEl('userAvatar', initials);
+  setEl('userName', name);
+  setEl('pdAvatar', initials);
+  setEl('pdName', name);
+  setEl('pdEmail', user.email);
 
   // Fill profile page
   fillProfilePage(user);
+
+  // Show home
+  showPage('home');
+
+  // Set greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Dzień dobry' : hour < 18 ? 'Cześć' : 'Dobry wieczór';
+  setEl('homeGreeting', `${greeting}, ${name}! 👋`);
 }
 
-// ── UI: user logged out ─────────────────────────────────
+// ── Logged Out ──────────────────────────────────────────
 function handleUserLoggedOut() {
   currentUser = null;
-
-  const authEl = document.getElementById('headerAuth');
-  if (authEl) {
-    authEl.innerHTML = `<button class="auth-btn" onclick="openAuthModal('login')">Zaloguj się</button>`;
-  }
-
-  const tab = document.getElementById('profileTab');
-  if (tab) tab.classList.add('hidden');
-
-  // Hide profile page if active
-  const profilePage = document.getElementById('profilePage');
-  if (profilePage && !profilePage.classList.contains('hidden')) {
-    profilePage.classList.add('hidden');
-    document.getElementById('formPanel').classList.remove('hidden');
-    document.querySelector('.results-panel').classList.remove('hidden');
-    switchMode('plan');
-  }
-}
-
-// ── Fill profile data ───────────────────────────────────
-function fillProfilePage(user) {
-  const name    = user.user_metadata?.full_name || user.email.split('@')[0];
-  const initials = name.charAt(0).toUpperCase();
-  const created  = new Date(user.created_at);
-  const now      = new Date();
-  const daysSince = Math.floor((now - created) / (1000 * 60 * 60 * 24));
-
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-
-  set('profileAvatar', initials);
-  set('profileName',   name);
-  set('profileEmail',  user.email);
-  set('profileSince',  `Z nami od ${created.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })}`);
-  set('infoName',      name);
-  set('infoEmail',     user.email);
-  set('infoCreated',   created.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }));
-  set('statDays',      daysSince);
-
-  // Load stats from localStorage
-  const plans = parseInt(localStorage.getItem(`forge_plans_${user.id}`) || '0');
-  const diets = parseInt(localStorage.getItem(`forge_diets_${user.id}`) || '0');
-  set('statPlans', plans);
-  set('statDiets', diets);
-}
-
-// ── Track generations ───────────────────────────────────
-function trackGeneration(type) {
-  if (!currentUser) return;
-  const key = `forge_${type}s_${currentUser.id}`;
-  const current = parseInt(localStorage.getItem(key) || '0');
-  localStorage.setItem(key, current + 1);
-
-  // Update displayed counter
-  const el = document.getElementById(type === 'plan' ? 'statPlans' : 'statDiets');
-  if (el) el.textContent = current + 1;
-}
-
-// ── Modal helpers ───────────────────────────────────────
-function openAuthModal(tab = 'login') {
-  document.getElementById('authModal').classList.remove('hidden');
-  switchAuthTab(tab);
-  // Clear errors
-  ['loginError','registerError'].forEach(id => {
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('authScreen').classList.remove('hidden');
+  // Reset auth form
+  switchAuthTab('login');
+  ['loginEmail','loginPassword','registerName','registerEmail','registerPassword'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) { el.textContent = ''; el.classList.add('hidden'); }
+    if (el) el.value = '';
   });
 }
 
-function closeAuthModal(e) {
-  if (!e || e.target === document.getElementById('authModal')) {
-    document.getElementById('authModal').classList.add('hidden');
-  }
+// ── Profile ─────────────────────────────────────────────
+function fillProfilePage(user) {
+  const name    = user.user_metadata?.full_name || user.email.split('@')[0];
+  const created = new Date(user.created_at);
+  const days    = Math.floor((new Date() - created) / 86400000);
+
+  setEl('profileAvatar', name.charAt(0).toUpperCase());
+  setEl('profileName', name);
+  setEl('profileEmail', user.email);
+  setEl('profileSince', `Z nami od ${created.toLocaleDateString('pl-PL', { year:'numeric', month:'long', day:'numeric' })}`);
+  setEl('infoName', name);
+  setEl('infoEmail', user.email);
+  setEl('infoCreated', created.toLocaleDateString('pl-PL', { year:'numeric', month:'long', day:'numeric' }));
+  setEl('statDays', days);
+  setEl('statPlans', localStorage.getItem(`forge_plans_${user.id}`) || '0');
+  setEl('statDiets', localStorage.getItem(`forge_diets_${user.id}`) || '0');
 }
 
+function trackGeneration(type) {
+  if (!currentUser) return;
+  const key = `forge_${type}s_${currentUser.id}`;
+  const val = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, val);
+  setEl(type === 'plan' ? 'statPlans' : 'statDiets', val);
+}
+
+// ── Page routing ─────────────────────────────────────────
+function showPage(page) {
+  // Hide all pages
+  ['homePage','planerPage','trackerPage','profilePage'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+
+  // Hide/show nav
+  const nav = document.getElementById('mainNav');
+  if (nav) nav.style.visibility = page === 'planer' ? 'visible' : 'hidden';
+
+  // Show target
+  const target = document.getElementById(page + 'Page');
+  if (target) target.classList.remove('hidden');
+
+  // Close dropdown
+  closeProfileDropdown();
+
+  // Init sliders when entering planer
+  if (page === 'planer' && typeof initSliders === 'function') initSliders();
+}
+
+function goHome() {
+  showPage('home');
+  closeProfileDropdown();
+}
+
+// ── Dropdown ─────────────────────────────────────────────
+function toggleProfileDropdown() {
+  const dd = document.getElementById('profileDropdown');
+  if (dd) dd.classList.toggle('hidden');
+}
+
+function closeProfileDropdown() {
+  const dd = document.getElementById('profileDropdown');
+  if (dd) dd.classList.add('hidden');
+}
+
+document.addEventListener('click', e => {
+  const chip = document.getElementById('userChip');
+  const dd   = document.getElementById('profileDropdown');
+  if (dd && chip && !chip.contains(e.target)) closeProfileDropdown();
+});
+
+// ── Auth UI helpers ──────────────────────────────────────
 function switchAuthTab(tab) {
   document.getElementById('loginTab').classList.toggle('active', tab === 'login');
   document.getElementById('registerTab').classList.toggle('active', tab === 'register');
@@ -202,10 +210,15 @@ function showAuthError(el, msg) {
   el.classList.remove('hidden');
 }
 
-function setAuthLoading(btn, loading) {
+function clearAuthError(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ''; el.classList.add('hidden'); el.style = ''; }
+}
+
+function setAuthLoading(btn, loading, text) {
   if (!btn) return;
-  const textEl = btn.querySelector('.btn-text');
-  if (textEl) textEl.textContent = loading ? 'Ładowanie...' : (btn.id === 'loginBtn' ? 'Zaloguj się' : 'Utwórz konto');
+  const t = btn.querySelector('.btn-text');
+  if (t) t.textContent = text;
   btn.disabled = loading;
 }
 
@@ -217,21 +230,7 @@ function togglePassword(inputId, btn) {
   btn.textContent = isText ? '👁' : '🙈';
 }
 
-// ── switchMode override for profile ────────────────────
-// (app.js switchMode calls this after its own logic)
-function showProfilePage(show) {
-  const profilePage  = document.getElementById('profilePage');
-  const formPanel    = document.getElementById('formPanel');
-  const resultsPanel = document.querySelector('.results-panel');
-
-  if (show) {
-    profilePage.classList.remove('hidden');
-    formPanel.classList.add('hidden');
-    resultsPanel.classList.add('hidden');
-    if (currentUser) fillProfilePage(currentUser);
-  } else {
-    profilePage.classList.add('hidden');
-    formPanel.classList.remove('hidden');
-    resultsPanel.classList.remove('hidden');
-  }
+function setEl(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
 }

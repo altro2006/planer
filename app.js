@@ -28,6 +28,15 @@ const LOADING_DIET_MSGS = [
 function switchMode(mode) {
   currentMode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+
+  if (mode === 'profile') {
+    if (typeof showProfilePage === 'function') showProfilePage(true);
+    return;
+  }
+
+  // Hide profile page if switching away
+  if (typeof showProfilePage === 'function') showProfilePage(false);
+
   document.getElementById('planForm').classList.toggle('active', mode === 'plan');
   document.getElementById('dietForm').classList.toggle('active', mode === 'diet');
   document.getElementById('formTitle').textContent    = mode === 'plan' ? 'Skonfiguruj Plan Treningowy' : 'Skonfiguruj Plan Diety';
@@ -255,6 +264,7 @@ async function generatePlan() {
     currentPlanData = data;
     renderPlanResults(data, vals);
     showPlanResults();
+    if (typeof trackGeneration === 'function') trackGeneration('plan');
   } catch (e) {
     stopLoading();
     showError(e.message);
@@ -274,6 +284,7 @@ async function generateDiet() {
     if (!data || !data.target_kcal) throw new Error('Nieprawidłowa odpowiedź AI — spróbuj ponownie.');
     renderDietResults(data, vals);
     showDietResults();
+    if (typeof trackGeneration === 'function') trackGeneration('diet');
   } catch (e) {
     stopLoading();
     showError(e.message);

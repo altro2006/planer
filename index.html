@@ -13,369 +13,404 @@
   <div class="bg-noise"></div>
   <div class="bg-gradient"></div>
 
-  <!-- ===== HEADER ===== -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">⚡</span>
-        <span class="logo-text">FORGE<span class="logo-accent">AI</span></span>
-        <span class="logo-badge">BETA</span>
+  <!-- ============================================================
+       SCREEN 1: AUTH (shown before login)
+  ============================================================ -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-screen-inner">
+
+      <!-- Left: branding -->
+      <div class="auth-branding">
+        <div class="auth-logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">FORGE<span class="logo-accent">AI</span></span>
+          <span class="logo-badge">BETA</span>
+        </div>
+        <h1 class="auth-headline">Trenuj mądrzej.<br/>Jedz lepiej.<br/>Rozwijaj się.</h1>
+        <p class="auth-tagline">Spersonalizowane plany treningowe i diety generowane przez AI — dostosowane do Twoich celów, poziomu i możliwości.</p>
+        <div class="auth-features">
+          <div class="auth-feature"><span class="af-icon">🏋️</span><span>Plany treningowe dopasowane do Ciebie</span></div>
+          <div class="auth-feature"><span class="af-icon">🥗</span><span>Kalkulacja makroskładników i kalorii</span></div>
+          <div class="auth-feature"><span class="af-icon">📊</span><span>Śledzenie postępów i pomiarów</span></div>
+          <div class="auth-feature"><span class="af-icon">⚡</span><span>Powered by AI — gotowe w sekundy</span></div>
+        </div>
       </div>
 
-      <nav class="mode-switcher" id="mainNav">
-        <button class="mode-btn active" data-mode="plan" onclick="switchMode('plan')">
-          <span class="mode-icon">🏋️</span>
-          <span>Plan Treningowy</span>
-        </button>
-        <button class="mode-btn" data-mode="diet" onclick="switchMode('diet')">
-          <span class="mode-icon">🥗</span>
-          <span>Plan Diety</span>
-        </button>
-        <!-- Profil tab — only visible when logged in -->
-        <button class="mode-btn hidden" data-mode="profile" id="profileTab" onclick="switchMode('profile')">
-          <span class="mode-icon">👤</span>
-          <span>Profil</span>
-        </button>
-      </nav>
-
-      <!-- Auth button area -->
-      <div class="header-auth" id="headerAuth">
-        <button class="auth-btn" onclick="openAuthModal('login')">Zaloguj się</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== MAIN ===== -->
-  <main class="main-layout">
-    <aside class="form-panel" id="formPanel">
-      <div class="panel-header">
-        <div class="panel-title" id="formTitle">Skonfiguruj Plan Treningowy</div>
-        <div class="panel-subtitle" id="formSubtitle">Wypełnij poniższe parametry, a AI ułoży dla Ciebie optymalny plan</div>
-      </div>
-
-      <!-- TRAINING FORM -->
-      <form id="planForm" class="forge-form active">
-        <div class="form-section">
-          <label class="form-label">Liczba treningów w tygodniu</label>
-          <div class="slider-wrap">
-            <div class="slider-value-display"><span id="trainDaysVal">2</span> <span class="slider-unit">dni</span></div>
-            <input type="range" id="trainDaysSlider" class="forge-slider" min="2" max="7" step="1" oninput="updateSlider('trainDays')" />
-            <div class="slider-ticks"><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
-          </div>
+      <!-- Right: auth form -->
+      <div class="auth-form-panel">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Zaloguj się</button>
+          <button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">Zarejestruj się</button>
         </div>
 
-        <div class="form-section">
-          <label class="form-label">Cel treningowy</label>
-          <div class="card-select" id="goalGroup">
-            <div class="card-option" data-val="masa mięśniowa">
-              <span class="card-icon">💪</span>
-              <span class="card-name">Masa mięśniowa</span>
-              <span class="card-desc">Budowa muskulatury i siły</span>
-            </div>
-            <div class="card-option" data-val="redukcja tkanki tłuszczowej">
-              <span class="card-icon">🔥</span>
-              <span class="card-name">Redukcja</span>
-              <span class="card-desc">Spalanie tłuszczu, rzeźba</span>
+        <!-- Login -->
+        <div id="loginForm" class="auth-form">
+          <div class="auth-welcome">Witaj z powrotem 👋</div>
+          <div class="auth-field">
+            <label class="form-label">Email</label>
+            <input type="email" id="loginEmail" class="forge-input" placeholder="twoj@email.com" />
+          </div>
+          <div class="auth-field">
+            <label class="form-label">Hasło</label>
+            <div class="password-wrap">
+              <input type="password" id="loginPassword" class="forge-input" placeholder="••••••••" />
+              <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)">👁</button>
             </div>
           </div>
+          <div class="auth-error hidden" id="loginError"></div>
+          <button class="generate-btn" type="button" id="loginBtn" onclick="login()">
+            <span class="btn-icon">🔓</span>
+            <span class="btn-text">Zaloguj się</span>
+            <span class="btn-glow"></span>
+          </button>
+          <div class="auth-switch">Nie masz konta? <a onclick="switchAuthTab('register')">Zarejestruj się za darmo</a></div>
         </div>
 
-        <div class="form-section">
-          <label class="form-label">Czas na trening</label>
-          <div class="slider-wrap">
-            <div class="slider-value-display"><span id="timeVal">30</span> <span class="slider-unit">min</span></div>
-            <input type="range" id="timeSlider" class="forge-slider" min="30" max="120" step="15" oninput="updateSlider('time')" />
-            <div class="slider-ticks"><span>30</span><span>45</span><span>60</span><span>75</span><span>90</span><span>105</span><span>120</span></div>
+        <!-- Register -->
+        <div id="registerForm" class="auth-form hidden">
+          <div class="auth-welcome">Zacznij swoją podróż 🚀</div>
+          <div class="auth-field">
+            <label class="form-label">Imię</label>
+            <input type="text" id="registerName" class="forge-input" placeholder="Twoje imię" />
           </div>
-        </div>
-
-        <div class="form-section">
-          <label class="form-label">Partie mięśniowe do trenowania</label>
-          <div class="tag-select" id="muscleGroup">
-            <span class="tag-btn" data-val="klatka piersiowa">Klatka</span>
-            <span class="tag-btn" data-val="plecy">Plecy</span>
-            <span class="tag-btn" data-val="nogi">Nogi</span>
-            <span class="tag-btn" data-val="barki">Barki</span>
-            <span class="tag-btn" data-val="biceps">Biceps</span>
-            <span class="tag-btn" data-val="triceps">Triceps</span>
-            <span class="tag-btn" data-val="brzuch">Brzuch</span>
-            <span class="tag-btn" data-val="łydki">Łydki</span>
-            <span class="tag-btn" data-val="pośladki">Pośladki</span>
-            <span class="tag-btn" data-val="przedramiona">Przedramiona</span>
+          <div class="auth-field">
+            <label class="form-label">Email</label>
+            <input type="email" id="registerEmail" class="forge-input" placeholder="twoj@email.com" />
           </div>
-        </div>
-
-        <div class="form-section">
-          <label class="form-label">Kontuzje / ograniczenia <span class="label-optional">(opcjonalnie)</span></label>
-          <div class="tag-select" id="injuryGroup">
-            <span class="tag-btn" data-val="problemy z kolanami">Kolana</span>
-            <span class="tag-btn" data-val="problemy z kręgosłupem">Kręgosłup</span>
-            <span class="tag-btn" data-val="problemy z barkiem">Bark</span>
-            <span class="tag-btn" data-val="problemy z nadgarstkami">Nadgarstki</span>
-            <span class="tag-btn" data-val="problemy z łokciem">Łokieć</span>
-            <span class="tag-btn" data-val="problemy z biodrami">Biodra</span>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <label class="form-label">Poziom zaawansowania</label>
-          <div class="slider-wrap">
-            <div class="slider-value-display level-display"><span id="levelVal">Początkujący</span></div>
-            <input type="range" id="levelSlider" class="forge-slider" min="0" max="2" step="1" oninput="updateSlider('level')" />
-            <div class="slider-ticks"><span>Początkujący</span><span>Średni</span><span>Zaawansowany</span></div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <label class="form-label">Preferowany split</label>
-          <div class="split-select" id="splitGroup">
-            <div class="split-option" data-val="Full Body"><span class="split-icon">🔄</span><span class="split-name">Full Body</span></div>
-            <div class="split-option" data-val="Push/Pull/Legs"><span class="split-icon">↕️</span><span class="split-name">PPL</span></div>
-            <div class="split-option" data-val="Upper/Lower"><span class="split-icon">↕️</span><span class="split-name">Upper/Lower</span></div>
-            <div class="split-option" data-val="Bro Split"><span class="split-icon">💪</span><span class="split-name">Bro Split</span></div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <label class="form-label">Dostępny sprzęt</label>
-          <div class="tag-select" id="equipGroup">
-            <span class="tag-btn" data-val="sztanga">Sztanga</span>
-            <span class="tag-btn" data-val="hantle">Hantle</span>
-            <span class="tag-btn" data-val="maszyny">Maszyny</span>
-            <span class="tag-btn" data-val="wyciągi">Wyciągi</span>
-            <span class="tag-btn" data-val="drążek">Drążek</span>
-            <span class="tag-btn" data-val="poręcze">Poręcze</span>
-            <span class="tag-btn" data-val="kettlebell">Kettlebell</span>
-            <span class="tag-btn" data-val="gumy oporowe">Gumy oporowe</span>
-            <span class="tag-btn" data-val="masa ciała">Masa ciała</span>
-          </div>
-        </div>
-
-        <button type="button" class="generate-btn" onclick="generatePlan()">
-          <span class="btn-icon">⚡</span>
-          <span class="btn-text">Wygeneruj Plan</span>
-          <span class="btn-glow"></span>
-        </button>
-      </form>
-
-      <!-- DIET FORM -->
-      <form id="dietForm" class="forge-form">
-        <div class="form-section">
-          <label class="form-label">Płeć</label>
-          <div class="card-select" id="genderGroup">
-            <div class="card-option" data-val="mężczyzna"><span class="card-icon">♂️</span><span class="card-name">Mężczyzna</span></div>
-            <div class="card-option" data-val="kobieta"><span class="card-icon">♀️</span><span class="card-name">Kobieta</span></div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-section half">
-            <label class="form-label">Wiek</label>
-            <div class="number-input-wrap">
-              <input type="number" id="ageInput" class="forge-input" min="10" max="100" placeholder="np. 25" />
-              <span class="input-unit">lat</span>
+          <div class="auth-field">
+            <label class="form-label">Hasło</label>
+            <div class="password-wrap">
+              <input type="password" id="registerPassword" class="forge-input" placeholder="Min. 6 znaków" />
+              <button type="button" class="toggle-pw" onclick="togglePassword('registerPassword', this)">👁</button>
             </div>
           </div>
-          <div class="form-section half">
-            <label class="form-label">Waga</label>
-            <div class="number-input-wrap">
-              <input type="number" id="weightInput" class="forge-input" min="30" max="300" placeholder="np. 75" />
-              <span class="input-unit">kg</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-section">
-          <label class="form-label">Wzrost</label>
-          <div class="number-input-wrap">
-            <input type="number" id="heightInput" class="forge-input" min="100" max="250" placeholder="np. 175" />
-            <span class="input-unit">cm</span>
-          </div>
-        </div>
-        <div class="form-section">
-          <label class="form-label">Aktywność w ciągu dnia</label>
-          <div class="activity-select" id="activityGroup">
-            <div class="activity-option" data-val="siedzący"><span class="activity-icon">💻</span><span class="activity-name">Siedzący</span><span class="activity-desc">Praca biurowa</span></div>
-            <div class="activity-option" data-val="lekko aktywny"><span class="activity-icon">🚶</span><span class="activity-name">Lekko aktywny</span><span class="activity-desc">Spacery, praca stojąca</span></div>
-            <div class="activity-option" data-val="umiarkowanie aktywny"><span class="activity-icon">🏃</span><span class="activity-name">Umiarkowany</span><span class="activity-desc">3-4x treningi/tyg</span></div>
-            <div class="activity-option" data-val="bardzo aktywny"><span class="activity-icon">⚡</span><span class="activity-name">Bardzo aktywny</span><span class="activity-desc">Ciężka praca fizyczna</span></div>
-          </div>
-        </div>
-        <div class="form-section">
-          <label class="form-label">Cel diety</label>
-          <div class="card-select three" id="dietGoalGroup">
-            <div class="card-option" data-val="masa"><span class="card-icon">📈</span><span class="card-name">Masa</span><span class="card-desc">Nadwyżka kaloryczna</span></div>
-            <div class="card-option" data-val="redukcja"><span class="card-icon">📉</span><span class="card-name">Redukcja</span><span class="card-desc">Deficyt kaloryczny</span></div>
-            <div class="card-option" data-val="utrzymanie"><span class="card-icon">⚖️</span><span class="card-name">Utrzymanie</span><span class="card-desc">Rekomponycja</span></div>
-          </div>
-        </div>
-        <button type="button" class="generate-btn" onclick="generateDiet()">
-          <span class="btn-icon">⚡</span>
-          <span class="btn-text">Oblicz Plan Diety</span>
-          <span class="btn-glow"></span>
-        </button>
-      </form>
-    </aside>
-
-    <!-- RIGHT: Results / Profile Panel -->
-    <section class="results-panel">
-
-      <!-- Empty state -->
-      <div id="emptyState" class="empty-state">
-        <div class="empty-icon">🏋️</div>
-        <div class="empty-title">Gotowy do akcji</div>
-        <div class="empty-text">Wypełnij formularz po lewej stronie i wygeneruj swój spersonalizowany plan za pomocą AI</div>
-        <div class="empty-features">
-          <div class="empty-feature"><span>✓</span> Plany dostosowane do Twoich możliwości</div>
-          <div class="empty-feature"><span>✓</span> Uwzględnia kontuzje i ograniczenia</div>
-          <div class="empty-feature"><span>✓</span> Szczegółowe instrukcje ćwiczeń</div>
+          <div class="auth-error hidden" id="registerError"></div>
+          <button class="generate-btn" type="button" id="registerBtn" onclick="register()">
+            <span class="btn-icon">⚡</span>
+            <span class="btn-text">Utwórz konto</span>
+            <span class="btn-glow"></span>
+          </button>
+          <div class="auth-switch">Masz już konto? <a onclick="switchAuthTab('login')">Zaloguj się</a></div>
         </div>
       </div>
 
-      <!-- Loading -->
-      <div id="loadingState" class="loading-state hidden">
-        <div class="loading-animation">
-          <div class="loading-bars">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-            <div class="bar"></div><div class="bar"></div>
-          </div>
-          <div class="loading-title">AI pracuje dla Ciebie</div>
-          <div class="loading-sub" id="loadingMessage">Analizuję Twoje parametry...</div>
-        </div>
-      </div>
-
-      <!-- Plan Results -->
-      <div id="planResults" class="plan-results hidden">
-        <div class="results-header">
-          <div>
-            <div class="results-title">Twój Plan Treningowy</div>
-            <div class="results-meta" id="planMeta"></div>
-          </div>
-          <button class="reset-btn" onclick="resetResults()">↺ Reset</button>
-        </div>
-        <div class="days-nav" id="daysNav"></div>
-        <div id="dayContent" class="day-content"></div>
-      </div>
-
-      <!-- Diet Results -->
-      <div id="dietResults" class="diet-results hidden">
-        <div class="results-header">
-          <div>
-            <div class="results-title">Twój Plan Diety</div>
-            <div class="results-meta" id="dietMeta"></div>
-          </div>
-          <button class="reset-btn" onclick="resetResults()">↺ Reset</button>
-        </div>
-        <div id="dietContent"></div>
-      </div>
-
-    </section>
-  </main>
-
-  <!-- ===== PROFILE PAGE (full screen, hidden by default) ===== -->
-  <div id="profilePage" class="profile-page hidden">
-    <div class="profile-container">
-      <div class="profile-hero">
-        <div class="profile-avatar" id="profileAvatar">?</div>
-        <div class="profile-hero-info">
-          <div class="profile-name" id="profileName">—</div>
-          <div class="profile-email" id="profileEmail">—</div>
-          <div class="profile-since" id="profileSince"></div>
-        </div>
-        <button class="logout-btn" onclick="logout()">Wyloguj się</button>
-      </div>
-
-      <div class="profile-stats">
-        <div class="profile-stat">
-          <div class="profile-stat-value" id="statPlans">0</div>
-          <div class="profile-stat-label">Wygenerowanych planów</div>
-        </div>
-        <div class="profile-stat">
-          <div class="profile-stat-value" id="statDiets">0</div>
-          <div class="profile-stat-label">Planów diety</div>
-        </div>
-        <div class="profile-stat">
-          <div class="profile-stat-value" id="statDays">0</div>
-          <div class="profile-stat-label">Dni z aplikacją</div>
-        </div>
-      </div>
-
-      <div class="profile-section-title">Informacje o koncie</div>
-      <div class="profile-info-grid">
-        <div class="profile-info-card">
-          <div class="profile-info-label">Imię</div>
-          <div class="profile-info-value" id="infoName">—</div>
-        </div>
-        <div class="profile-info-card">
-          <div class="profile-info-label">Email</div>
-          <div class="profile-info-value" id="infoEmail">—</div>
-        </div>
-        <div class="profile-info-card">
-          <div class="profile-info-label">Konto utworzone</div>
-          <div class="profile-info-value" id="infoCreated">—</div>
-        </div>
-        <div class="profile-info-card">
-          <div class="profile-info-label">Status konta</div>
-          <div class="profile-info-value"><span class="status-badge">Aktywne ✓</span></div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- ===== AUTH MODAL ===== -->
-  <div id="authModal" class="modal-overlay hidden" onclick="closeAuthModal(event)">
-    <div class="modal-box">
-      <!-- Tabs -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Zaloguj się</button>
-        <button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">Zarejestruj się</button>
-      </div>
+  <!-- ============================================================
+       SCREEN 2: APP (shown after login)
+  ============================================================ -->
+  <div id="appScreen" class="hidden">
 
-      <!-- Login form -->
-      <div id="loginForm" class="auth-form">
-        <div class="auth-field">
-          <label class="form-label">Email</label>
-          <input type="email" id="loginEmail" class="forge-input" placeholder="twoj@email.com" />
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo" onclick="goHome()" style="cursor:pointer">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">FORGE<span class="logo-accent">AI</span></span>
+          <span class="logo-badge">BETA</span>
         </div>
-        <div class="auth-field">
-          <label class="form-label">Hasło</label>
-          <div class="password-wrap">
-            <input type="password" id="loginPassword" class="forge-input" placeholder="••••••••" />
-            <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)">👁</button>
+
+        <!-- Center nav — only visible inside planer -->
+        <nav class="mode-switcher" id="mainNav" style="visibility:hidden">
+          <button class="mode-btn active" data-mode="plan" onclick="switchMode('plan')">
+            <span class="mode-icon">🏋️</span>
+            <span>Plan Treningowy</span>
+          </button>
+          <button class="mode-btn" data-mode="diet" onclick="switchMode('diet')">
+            <span class="mode-icon">🥗</span>
+            <span>Plan Diety</span>
+          </button>
+        </nav>
+
+        <!-- Right: user chip -->
+        <div class="header-auth">
+          <div class="user-chip" id="userChip" onclick="toggleProfileDropdown()">
+            <div class="user-avatar" id="userAvatar">?</div>
+            <span class="user-name" id="userName">—</span>
+            <span class="user-chevron">▾</span>
+          </div>
+          <!-- Dropdown -->
+          <div class="profile-dropdown hidden" id="profileDropdown">
+            <div class="pd-header">
+              <div class="pd-avatar" id="pdAvatar">?</div>
+              <div>
+                <div class="pd-name" id="pdName">—</div>
+                <div class="pd-email" id="pdEmail">—</div>
+              </div>
+            </div>
+            <div class="pd-divider"></div>
+            <button class="pd-item" onclick="showPage('profile')">👤 Mój profil</button>
+            <button class="pd-item" onclick="goHome()">🏠 Strona główna</button>
+            <div class="pd-divider"></div>
+            <button class="pd-item danger" onclick="logout()">🚪 Wyloguj się</button>
           </div>
         </div>
-        <div class="auth-error hidden" id="loginError"></div>
-        <button class="generate-btn" type="button" onclick="login()">
-          <span class="btn-icon">🔓</span>
-          <span class="btn-text">Zaloguj się</span>
-          <span class="btn-glow"></span>
-        </button>
       </div>
+    </header>
 
-      <!-- Register form -->
-      <div id="registerForm" class="auth-form hidden">
-        <div class="auth-field">
-          <label class="form-label">Imię</label>
-          <input type="text" id="registerName" class="forge-input" placeholder="Twoje imię" />
-        </div>
-        <div class="auth-field">
-          <label class="form-label">Email</label>
-          <input type="email" id="registerEmail" class="forge-input" placeholder="twoj@email.com" />
-        </div>
-        <div class="auth-field">
-          <label class="form-label">Hasło</label>
-          <div class="password-wrap">
-            <input type="password" id="registerPassword" class="forge-input" placeholder="Min. 6 znaków" />
-            <button type="button" class="toggle-pw" onclick="togglePassword('registerPassword', this)">👁</button>
+    <!-- ── HOME PAGE ── -->
+    <div id="homePage" class="page">
+      <div class="home-container">
+        <div class="home-greeting" id="homeGreeting">Cześć!</div>
+        <div class="home-subtitle">Co dziś robimy?</div>
+
+        <div class="home-cards">
+          <div class="home-card" onclick="showPage('planer')">
+            <div class="home-card-glow"></div>
+            <div class="home-card-icon">🏋️</div>
+            <div class="home-card-title">Planer</div>
+            <div class="home-card-desc">Generuj spersonalizowane plany treningowe i diety za pomocą AI. Dobierz split, partie i sprzęt.</div>
+            <div class="home-card-cta">Otwórz Planer <span>→</span></div>
+          </div>
+
+          <div class="home-card" onclick="showPage('tracker')">
+            <div class="home-card-glow"></div>
+            <div class="home-card-icon">📊</div>
+            <div class="home-card-title">Tracker</div>
+            <div class="home-card-desc">Śledź swoje postępy, zapisuj pomiary ciała i monitoruj realizację planów treningowych.</div>
+            <div class="home-card-cta">Otwórz Tracker <span>→</span></div>
           </div>
         </div>
-        <div class="auth-error hidden" id="registerError"></div>
-        <button class="generate-btn" type="button" onclick="register()">
-          <span class="btn-icon">⚡</span>
-          <span class="btn-text">Utwórz konto</span>
-          <span class="btn-glow"></span>
-        </button>
       </div>
     </div>
-  </div>
+
+    <!-- ── PLANER PAGE ── -->
+    <div id="planerPage" class="page hidden">
+      <main class="main-layout">
+        <aside class="form-panel" id="formPanel">
+          <div class="panel-header">
+            <div class="panel-title" id="formTitle">Skonfiguruj Plan Treningowy</div>
+            <div class="panel-subtitle" id="formSubtitle">Wypełnij poniższe parametry, a AI ułoży dla Ciebie optymalny plan</div>
+          </div>
+
+          <!-- TRAINING FORM -->
+          <form id="planForm" class="forge-form active">
+            <div class="form-section">
+              <label class="form-label">Liczba treningów w tygodniu</label>
+              <div class="slider-wrap">
+                <div class="slider-value-display"><span id="trainDaysVal">2</span> <span class="slider-unit">dni</span></div>
+                <input type="range" id="trainDaysSlider" class="forge-slider" min="2" max="7" step="1" oninput="updateSlider('trainDays')" />
+                <div class="slider-ticks"><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Cel treningowy</label>
+              <div class="card-select" id="goalGroup">
+                <div class="card-option" data-val="masa mięśniowa"><span class="card-icon">💪</span><span class="card-name">Masa mięśniowa</span><span class="card-desc">Budowa muskulatury i siły</span></div>
+                <div class="card-option" data-val="redukcja tkanki tłuszczowej"><span class="card-icon">🔥</span><span class="card-name">Redukcja</span><span class="card-desc">Spalanie tłuszczu, rzeźba</span></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Czas na trening</label>
+              <div class="slider-wrap">
+                <div class="slider-value-display"><span id="timeVal">30</span> <span class="slider-unit">min</span></div>
+                <input type="range" id="timeSlider" class="forge-slider" min="30" max="120" step="15" oninput="updateSlider('time')" />
+                <div class="slider-ticks"><span>30</span><span>45</span><span>60</span><span>75</span><span>90</span><span>105</span><span>120</span></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Partie mięśniowe do trenowania</label>
+              <div class="tag-select" id="muscleGroup">
+                <span class="tag-btn" data-val="klatka piersiowa">Klatka</span>
+                <span class="tag-btn" data-val="plecy">Plecy</span>
+                <span class="tag-btn" data-val="nogi">Nogi</span>
+                <span class="tag-btn" data-val="barki">Barki</span>
+                <span class="tag-btn" data-val="biceps">Biceps</span>
+                <span class="tag-btn" data-val="triceps">Triceps</span>
+                <span class="tag-btn" data-val="brzuch">Brzuch</span>
+                <span class="tag-btn" data-val="łydki">Łydki</span>
+                <span class="tag-btn" data-val="pośladki">Pośladki</span>
+                <span class="tag-btn" data-val="przedramiona">Przedramiona</span>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Kontuzje / ograniczenia <span class="label-optional">(opcjonalnie)</span></label>
+              <div class="tag-select" id="injuryGroup">
+                <span class="tag-btn" data-val="problemy z kolanami">Kolana</span>
+                <span class="tag-btn" data-val="problemy z kręgosłupem">Kręgosłup</span>
+                <span class="tag-btn" data-val="problemy z barkiem">Bark</span>
+                <span class="tag-btn" data-val="problemy z nadgarstkami">Nadgarstki</span>
+                <span class="tag-btn" data-val="problemy z łokciem">Łokieć</span>
+                <span class="tag-btn" data-val="problemy z biodrami">Biodra</span>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Poziom zaawansowania</label>
+              <div class="slider-wrap">
+                <div class="slider-value-display level-display"><span id="levelVal">Początkujący</span></div>
+                <input type="range" id="levelSlider" class="forge-slider" min="0" max="2" step="1" oninput="updateSlider('level')" />
+                <div class="slider-ticks"><span>Początkujący</span><span>Średni</span><span>Zaawansowany</span></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Preferowany split</label>
+              <div class="split-select" id="splitGroup">
+                <div class="split-option" data-val="Full Body"><span class="split-icon">🔄</span><span class="split-name">Full Body</span></div>
+                <div class="split-option" data-val="Push/Pull/Legs"><span class="split-icon">↕️</span><span class="split-name">PPL</span></div>
+                <div class="split-option" data-val="Upper/Lower"><span class="split-icon">↕️</span><span class="split-name">Upper/Lower</span></div>
+                <div class="split-option" data-val="Bro Split"><span class="split-icon">💪</span><span class="split-name">Bro Split</span></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">Dostępny sprzęt</label>
+              <div class="tag-select" id="equipGroup">
+                <span class="tag-btn" data-val="sztanga">Sztanga</span>
+                <span class="tag-btn" data-val="hantle">Hantle</span>
+                <span class="tag-btn" data-val="maszyny">Maszyny</span>
+                <span class="tag-btn" data-val="wyciągi">Wyciągi</span>
+                <span class="tag-btn" data-val="drążek">Drążek</span>
+                <span class="tag-btn" data-val="poręcze">Poręcze</span>
+                <span class="tag-btn" data-val="kettlebell">Kettlebell</span>
+                <span class="tag-btn" data-val="gumy oporowe">Gumy oporowe</span>
+                <span class="tag-btn" data-val="masa ciała">Masa ciała</span>
+              </div>
+            </div>
+
+            <button type="button" class="generate-btn" onclick="generatePlan()">
+              <span class="btn-icon">⚡</span><span class="btn-text">Wygeneruj Plan</span><span class="btn-glow"></span>
+            </button>
+          </form>
+
+          <!-- DIET FORM -->
+          <form id="dietForm" class="forge-form">
+            <div class="form-section">
+              <label class="form-label">Płeć</label>
+              <div class="card-select" id="genderGroup">
+                <div class="card-option" data-val="mężczyzna"><span class="card-icon">♂️</span><span class="card-name">Mężczyzna</span></div>
+                <div class="card-option" data-val="kobieta"><span class="card-icon">♀️</span><span class="card-name">Kobieta</span></div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-section half">
+                <label class="form-label">Wiek</label>
+                <div class="number-input-wrap"><input type="number" id="ageInput" class="forge-input" min="10" max="100" placeholder="np. 25" /><span class="input-unit">lat</span></div>
+              </div>
+              <div class="form-section half">
+                <label class="form-label">Waga</label>
+                <div class="number-input-wrap"><input type="number" id="weightInput" class="forge-input" min="30" max="300" placeholder="np. 75" /><span class="input-unit">kg</span></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Wzrost</label>
+              <div class="number-input-wrap"><input type="number" id="heightInput" class="forge-input" min="100" max="250" placeholder="np. 175" /><span class="input-unit">cm</span></div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Aktywność w ciągu dnia</label>
+              <div class="activity-select" id="activityGroup">
+                <div class="activity-option" data-val="siedzący"><span class="activity-icon">💻</span><span class="activity-name">Siedzący</span><span class="activity-desc">Praca biurowa</span></div>
+                <div class="activity-option" data-val="lekko aktywny"><span class="activity-icon">🚶</span><span class="activity-name">Lekko aktywny</span><span class="activity-desc">Spacery, praca stojąca</span></div>
+                <div class="activity-option" data-val="umiarkowanie aktywny"><span class="activity-icon">🏃</span><span class="activity-name">Umiarkowany</span><span class="activity-desc">3-4x treningi/tyg</span></div>
+                <div class="activity-option" data-val="bardzo aktywny"><span class="activity-icon">⚡</span><span class="activity-name">Bardzo aktywny</span><span class="activity-desc">Ciężka praca fizyczna</span></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Cel diety</label>
+              <div class="card-select three" id="dietGoalGroup">
+                <div class="card-option" data-val="masa"><span class="card-icon">📈</span><span class="card-name">Masa</span><span class="card-desc">Nadwyżka kaloryczna</span></div>
+                <div class="card-option" data-val="redukcja"><span class="card-icon">📉</span><span class="card-name">Redukcja</span><span class="card-desc">Deficyt kaloryczny</span></div>
+                <div class="card-option" data-val="utrzymanie"><span class="card-icon">⚖️</span><span class="card-name">Utrzymanie</span><span class="card-desc">Rekomponycja</span></div>
+              </div>
+            </div>
+            <button type="button" class="generate-btn" onclick="generateDiet()">
+              <span class="btn-icon">⚡</span><span class="btn-text">Oblicz Plan Diety</span><span class="btn-glow"></span>
+            </button>
+          </form>
+        </aside>
+
+        <section class="results-panel">
+          <div id="emptyState" class="empty-state">
+            <div class="empty-icon">🏋️</div>
+            <div class="empty-title">Gotowy do akcji</div>
+            <div class="empty-text">Wypełnij formularz po lewej i wygeneruj swój spersonalizowany plan za pomocą AI</div>
+            <div class="empty-features">
+              <div class="empty-feature"><span>✓</span> Plany dostosowane do Twoich możliwości</div>
+              <div class="empty-feature"><span>✓</span> Uwzględnia kontuzje i ograniczenia</div>
+              <div class="empty-feature"><span>✓</span> Szczegółowe instrukcje ćwiczeń</div>
+            </div>
+          </div>
+          <div id="loadingState" class="loading-state hidden">
+            <div class="loading-animation">
+              <div class="loading-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+              <div class="loading-title">AI pracuje dla Ciebie</div>
+              <div class="loading-sub" id="loadingMessage">Analizuję Twoje parametry...</div>
+            </div>
+          </div>
+          <div id="planResults" class="plan-results hidden">
+            <div class="results-header">
+              <div><div class="results-title">Twój Plan Treningowy</div><div class="results-meta" id="planMeta"></div></div>
+              <button class="reset-btn" onclick="resetResults()">↺ Reset</button>
+            </div>
+            <div class="days-nav" id="daysNav"></div>
+            <div id="dayContent" class="day-content"></div>
+          </div>
+          <div id="dietResults" class="diet-results hidden">
+            <div class="results-header">
+              <div><div class="results-title">Twój Plan Diety</div><div class="results-meta" id="dietMeta"></div></div>
+              <button class="reset-btn" onclick="resetResults()">↺ Reset</button>
+            </div>
+            <div id="dietContent"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ── TRACKER PAGE ── -->
+    <div id="trackerPage" class="page hidden">
+      <div class="coming-soon">
+        <div class="cs-bg-text">SOON</div>
+        <div class="cs-content">
+          <div class="cs-icon">📊</div>
+          <div class="cs-title">Tracker</div>
+          <div class="cs-subtitle">Coming Soon</div>
+          <div class="cs-desc">Pracujemy nad modułem śledzenia postępów. Wkrótce będziesz mógł zapisywać pomiary, monitorować treningi i obserwować swój rozwój w czasie.</div>
+          <div class="cs-tags">
+            <span>📏 Pomiary ciała</span>
+            <span>🏋️ Historia treningów</span>
+            <span>📈 Wykresy postępów</span>
+            <span>🎯 Cele i milestony</span>
+          </div>
+          <button class="reset-btn" onclick="goHome()" style="margin-top:32px">← Wróć do strony głównej</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE PAGE ── -->
+    <div id="profilePage" class="page hidden">
+      <div class="profile-container">
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profileAvatar">?</div>
+          <div class="profile-hero-info">
+            <div class="profile-name" id="profileName">—</div>
+            <div class="profile-email" id="profileEmail">—</div>
+            <div class="profile-since" id="profileSince"></div>
+          </div>
+          <button class="logout-btn" onclick="logout()">Wyloguj się</button>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><div class="profile-stat-value" id="statPlans">0</div><div class="profile-stat-label">Wygenerowanych planów</div></div>
+          <div class="profile-stat"><div class="profile-stat-value" id="statDiets">0</div><div class="profile-stat-label">Planów diety</div></div>
+          <div class="profile-stat"><div class="profile-stat-value" id="statDays">0</div><div class="profile-stat-label">Dni z aplikacją</div></div>
+        </div>
+        <div class="profile-section-title">Informacje o koncie</div>
+        <div class="profile-info-grid">
+          <div class="profile-info-card"><div class="profile-info-label">Imię</div><div class="profile-info-value" id="infoName">—</div></div>
+          <div class="profile-info-card"><div class="profile-info-label">Email</div><div class="profile-info-value" id="infoEmail">—</div></div>
+          <div class="profile-info-card"><div class="profile-info-label">Konto utworzone</div><div class="profile-info-value" id="infoCreated">—</div></div>
+          <div class="profile-info-card"><div class="profile-info-label">Status konta</div><div class="profile-info-value"><span class="status-badge">Aktywne ✓</span></div></div>
+        </div>
+        <button class="reset-btn" onclick="goHome()" style="margin-top:32px">← Wróć do strony głównej</button>
+      </div>
+    </div>
+
+  </div><!-- /appScreen -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js"></script>
